@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "daymark-shell-v3";
+const CACHE_NAME = "daymark-shell-v5";
 const APP_SHELL = [
   "./",
   "./index.html",

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#172d3d">
+  <meta name="theme-color" content="#04184e">
   <meta name="description" content="A thoughtful planner for study, goals, focus, routines and everyday life.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
@@ -226,6 +226,475 @@
       .field textarea { min-height: 48px }
       .footer { margin-top: 10px }
     }
+    /* Cinematic gallery direction */
+    :root {
+      color-scheme: dark;
+      --ink: #e9e9ee;
+      --navy: #f5f5f7;
+      --muted: #92939c;
+      --paper: #111216;
+      --canvas: #090a0d;
+      --line: #292a30;
+      --teal: #adc2ff;
+      --teal-pale: #191c26;
+      --gold: #a9c2ff;
+      --shadow: 0 16px 38px rgb(0 0 0 / 24%);
+      --radius: 2px;
+      --focus-ring: #91b1ff;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --ink: #f1f1f5;
+      --navy: #fff;
+      --muted: #a3a4ad;
+      --paper: #0c0d11;
+      --canvas: #050609;
+      --line: #25262d;
+      --teal: #c2d0ff;
+      --teal-pale: #171b27;
+      --gold: #bfd0ff;
+      --shadow: 0 18px 44px rgb(0 0 0 / 34%);
+    }
+    body {
+      min-width: 320px;
+      background:
+        radial-gradient(ellipse at 50% 46%, rgb(0 112 255 / 54%), transparent 29rem),
+        radial-gradient(ellipse at 50% 50%, #06339c 0, #082775 37%, #04184e 78%, #03133c 100%);
+      color: var(--ink);
+      font: 14px/1.65 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: .005em;
+    }
+    .app {
+      grid-template-columns: 168px minmax(0, 1fr);
+      width: min(1510px, calc(100% - 9vw));
+      min-height: calc(100vh - 10vh);
+      margin: 5vh auto;
+      overflow: hidden;
+      border: 1px solid rgb(255 255 255 / 9%);
+      border-radius: 17px;
+      background: #090a0d;
+      box-shadow: 0 40px 110px rgb(0 0 0 / 55%), 0 0 100px rgb(22 106 255 / 20%);
+    }
+    .sidebar {
+      position: sticky;
+      top: 5vh;
+      height: 90vh;
+      padding: 22px 13px;
+      border-right: 1px solid #ffffff13;
+      background: #07080a;
+      color: #c7c7cc;
+    }
+    .wordmark { padding: 5px 8px 18px; border-color: #ffffff19 }
+    .wordmark small { color: #9daed7; font-size: 7px; letter-spacing: .18em }
+    .wordmark h1 {
+      display: block;
+      margin: 9px 0 5px;
+      color: #f5f5f4;
+      font: 500 25px/1 Georgia, "Times New Roman", serif;
+      letter-spacing: -.04em;
+    }
+    .wordmark h1::before { display: none }
+    .wordmark p { color: #777980; font-size: 9px; line-height: 1.6 }
+    .nav-group { margin: 20px 8px 7px; color: #70727a; font-size: 7px; letter-spacing: .18em }
+    .nav { gap: 2px }
+    .nav button {
+      min-height: 34px;
+      padding: 7px 8px;
+      border-radius: 2px;
+      color: #a5a6ab;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .02em;
+      transition: color .2s ease, background .2s ease, padding .2s ease;
+    }
+    .nav button:hover { transform: none; padding-left: 11px; background: #ffffff0b; color: #fff }
+    .nav button.active { background: #ffffff0a; color: #fff; box-shadow: inset 2px 0 #9cbcff }
+    .sidebar-note {
+      margin: 20px 7px 5px;
+      padding: 11px 8px;
+      border: 0;
+      border-top: 1px solid #ffffff18;
+      border-radius: 0;
+      background: transparent;
+      color: #73757d;
+      font-size: 8px;
+      line-height: 1.8;
+    }
+    main { padding: 19px clamp(19px, 3vw, 44px) 48px; background: #0b0c10 }
+    .topbar { gap: 12px; margin-bottom: 27px; padding-bottom: 12px; border-bottom: 1px solid #ffffff17 }
+    .topbar > div:first-child { min-width: 150px }
+    .kicker { color: #a9c1fa; font-size: 9px; letter-spacing: .16em }
+    .topbar-note { color: #8d8e96; font-size: 11px }
+    .actions { justify-content: flex-end; gap: 5px }
+    .storage-status { min-height: 29px; padding: 5px 8px; border: 1px solid #ffffff1a; border-radius: 2px; background: #ffffff06; color: #a7a8af; font-size: 9px }
+    .button {
+      min-height: 32px;
+      padding: 6px 9px;
+      border: 1px solid #ffffff24;
+      border-radius: 2px;
+      background: transparent;
+      color: #dedee2;
+      font-size: 10px;
+      font-weight: 500;
+      box-shadow: none;
+      transition: color .18s ease, background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .button:hover { transform: translateY(-1px); border-color: #b6c8f3; background: #ffffff0d; color: #fff; box-shadow: none }
+    .button.primary { border-color: #d7e3ff; background: #eef3ff; color: #10131d; box-shadow: none }
+    .button.primary:hover { border-color: #fff; background: #fff; color: #080a0f }
+    .button:focus-visible, .nav button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, .calendar-day:focus-visible {
+      outline: 2px solid #9ebcff;
+      outline-offset: 3px;
+    }
+    .page { width: min(1190px, 100%) }
+    .page.active { animation: editorial-enter .5s cubic-bezier(.2,.7,.2,1) both }
+    @keyframes editorial-enter { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: translateY(0) } }
+    .page-header { align-items: flex-end; margin-bottom: 19px; padding-bottom: 15px; border-color: #ffffff1c }
+    .page-header h2 { margin: 7px 0; color: #f3f2ef; font: 400 clamp(31px, 4vw, 48px)/1.04 Georgia, "Times New Roman", serif; letter-spacing: -.04em }
+    .page-header p { color: #92939a; font-size: 12px; line-height: 1.8 }
+    .folio { color: #a7bee9; font: 500 8px/1.5 Inter, ui-sans-serif, system-ui, sans-serif; letter-spacing: .14em }
+    .hero {
+      position: relative;
+      min-height: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      overflow: hidden;
+      isolation: isolate;
+      margin-bottom: 12px;
+      padding: clamp(24px, 4vw, 42px);
+      border: 1px solid #ffffff16;
+      border-radius: 3px;
+      background:
+        radial-gradient(ellipse at 75% 48%, rgb(80 105 190 / 17%), transparent 23rem),
+        linear-gradient(112deg, #050609, #0b0c10 70%, #0c0e15);
+      color: #f8f7f4;
+      box-shadow: 0 23px 60px rgb(0 0 0 / 26%);
+    }
+    .hero::before {
+      position: absolute;
+      z-index: -1;
+      top: -19%;
+      right: 12%;
+      width: 41%;
+      aspect-ratio: 1;
+      border: 3px solid rgb(240 244 255 / 90%);
+      border-radius: 50%;
+      box-shadow: 0 0 22px rgb(188 208 255 / 28%), inset 0 0 22px rgb(188 208 255 / 7%);
+      animation: ring-breathe 7s ease-in-out infinite alternate;
+      content: "";
+    }
+    @keyframes ring-breathe { to { transform: scale(1.035); box-shadow: 0 0 36px rgb(188 208 255 / 37%), inset 0 0 28px rgb(188 208 255 / 10%) } }
+    .hero::after { display: none }
+    .hero > :not(.hero-art) { position: relative; z-index: 2; max-width: 58% }
+    .hero .kicker { color: #c1d0f0; font-size: 9px; letter-spacing: .18em }
+    .hero h2 { margin: 11px 0 12px; color: #f7f5f0; font: 400 clamp(34px, 4.5vw, 58px)/.99 Georgia, "Times New Roman", serif; letter-spacing: -.045em }
+    .hero p { margin: 0 0 18px; color: #b8b8bd; font-size: 12px; line-height: 1.8 }
+    .hero .row { gap: 7px }
+    .hero .button { border-color: #ffffff45; background: #ffffff05; color: #eeeef0 }
+    .hero .button:hover { border-color: #fff; background: #ffffff12 }
+    .hero .button.primary { border-color: #f2f4fb; background: #f2f4fb; color: #11131a }
+    .hero .pill { border: 0; background: transparent; color: #b5c5e8; font-size: 9px }
+    .hero-art {
+      position: absolute;
+      z-index: 1;
+      inset: 3% 1% 0 auto;
+      width: 48%;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+    .hero-art svg { width: min(100%, 400px); height: 100%; overflow: visible; filter: drop-shadow(0 10px 24px rgb(0 0 0 / 42%)); animation: artwork-float 8s ease-in-out infinite }
+    @keyframes artwork-float { 50% { transform: translateY(-7px) rotate(1deg) } }
+    .hero-art-caption { position: absolute; right: 4%; bottom: 11%; display: grid; gap: 7px; text-align: left }
+    .hero-art-caption span { color: #aebfe4; font-size: 7px; letter-spacing: .2em }
+    .hero-art-caption strong { color: #e5e6eb; font: 400 14px/1.3 Georgia, "Times New Roman", serif }
+    .grid { gap: 11px }
+    .card {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid #ffffff18;
+      border-radius: 3px;
+      background: linear-gradient(145deg, #111216, #0e0f13);
+      box-shadow: none;
+      transition: border-color .22s ease, background .22s ease, transform .22s ease;
+    }
+    .card:hover { transform: translateY(-2px); border-color: #ffffff42; background: linear-gradient(145deg, #15161b, #101116); box-shadow: none }
+    .page-home > .cols-4 .card { min-height: 94px; padding: 13px 15px; border-top: 1px solid #ffffff25 }
+    .page-home > .cols-4 .card:first-child { border-top: 1px solid #a9c2ff }
+    .page-home > .cols-4 .card:nth-child(2) { border-top: 1px solid #c7b9a2 }
+    .page-home > .cols-4 .card:nth-child(3) { border-top: 1px solid #8da99e }
+    .page-home > .cols-4 .card:nth-child(4) { border-top: 1px solid #ad9caf }
+    .metric { color: #efeff3; font: 400 23px/1.2 Georgia, "Times New Roman", serif; letter-spacing: -.02em }
+    .metric-label { margin-top: 6px; color: #8c8d95; font-size: 8px; font-weight: 500; letter-spacing: .14em }
+    .small { color: #92939a; font-size: 10px; line-height: 1.7 }
+    .card h3 { margin: 0 0 10px; color: #e9e8e4; font: 400 16px/1.35 Georgia, "Times New Roman", serif; letter-spacing: -.015em }
+    .card p { line-height: 1.8 }
+    .card.tinted { border-color: #ffffff20; background: #12141b; box-shadow: none }
+    .card.dark {
+      border-color: #454854;
+      background:
+        radial-gradient(ellipse at 78% 12%, rgb(156 178 234 / 15%), transparent 17rem),
+        linear-gradient(135deg, #090a0e, #161821);
+      color: #f1f1f4;
+      box-shadow: inset 0 1px rgb(255 255 255 / 5%);
+    }
+    .card.dark h3 { color: #e8e8ed }
+    .card.dark .small, .card.dark .timer-status { color: #b7b9c3 }
+    .card.dark .field > span { color: #c6c8d0 }
+    .separator { gap: 11px; margin: 20px 0 10px; color: #b2c4e7; font: 500 8px/1.5 Inter, ui-sans-serif, system-ui, sans-serif; letter-spacing: .17em }
+    .separator::after { background: #ffffff20 }
+    .field { margin: 10px 0 }
+    .field > span { margin-bottom: 6px; color: #a0a1a8; font-size: 7px; letter-spacing: .13em }
+    .field input, .field textarea, .field select, .time-slot input, .date-input,
+    .table input:not([type="checkbox"]), .table select {
+      min-height: 39px;
+      padding: 9px 10px;
+      border: 1px solid #ffffff20;
+      border-radius: 2px;
+      background: #090a0d;
+      color: #ececf0;
+      font-size: 12px;
+    }
+    .field textarea { min-height: 78px; line-height: 1.6 }
+    .field input:focus, .field textarea:focus, .field select:focus, .time-slot input:focus { border-color: #9bb9ff; outline: none; box-shadow: 0 0 0 2px rgb(122 159 232 / 17%) }
+    .field input::placeholder, .field textarea::placeholder { color: #686a72 }
+    .checklist { gap: 8px }
+    .check { gap: 9px; color: #c8c8ce; font-size: 12px; line-height: 1.6 }
+    .check input, .table input[type="checkbox"], .consent-row input { accent-color: #96b5ff }
+    .progress { height: 4px; background: #27282e }
+    .progress span { background: linear-gradient(90deg, #8caef6, #e1e9ff) }
+    .callout { margin: 12px 0; padding: 10px 12px; border-left: 1px solid #9ab8ff; border-radius: 0; background: #111319; color: #b2b4bd; font-size: 10px; line-height: 1.8 }
+    .callout.teal { border-color: #91adf2; background: #10131a; color: #c0c6d5 }
+    .pill { padding: 4px 8px; border: 1px solid #ffffff20; border-radius: 2px; background: #ffffff06; color: #c1cce3; font-size: 8px; font-weight: 500 }
+    .week-grid { gap: 5px }
+    .day-tile {
+      min-height: 76px;
+      padding: 8px 5px;
+      border: 1px solid #ffffff20;
+      border-radius: 2px;
+      background: #0d0e12;
+      transition: border-color .2s ease, background .2s ease;
+    }
+    .day-tile:hover { transform: none; border-color: #a8c1ff; background: #141721; box-shadow: none }
+    .day-tile strong { color: #e9e9ed; font: 500 10px Georgia, "Times New Roman", serif }
+    .day-tile span { color: #858790; font-size: 8px }
+    .day-tile .button { min-height: 25px; margin-top: 5px; padding: 3px 6px; font-size: 8px }
+    .time-grid { gap: 8px 12px }
+    .time-slot { grid-template-columns: 50px minmax(0, 1fr); gap: 7px }
+    .time-slot label { color: #999ba3; font-size: 9px }
+    .calendar { gap: 4px }
+    .calendar-head { padding: 5px; color: #858790; font-size: 7px; letter-spacing: .13em }
+    .calendar-day { min-height: 59px; padding: 5px; border: 1px solid #ffffff1c; border-radius: 2px; background: #101115; transition: background .18s ease, border-color .18s ease }
+    .calendar-day:hover, .calendar-day.selected { transform: none; border-color: #9cb9ff; background: #171a24 }
+    .calendar-day.outside { opacity: .35 }
+    .calendar-day strong { color: #eeeef0; font: 500 11px Georgia, "Times New Roman", serif }
+    .calendar-day small { color: #a7bee9; font-size: 7px }
+    .table-wrap { border-radius: 2px }
+    .table { font-size: 9px }
+    .table th { padding: 9px 6px; border-color: #ffffff1b; color: #8e9098; font-size: 7px; letter-spacing: .14em }
+    .table td { padding: 7px 6px; border-color: #ffffff13 }
+    .table td:first-child { color: #e4e4e8 }
+    .table input:not([type="checkbox"]), .table select { min-width: 80px; min-height: 33px; padding: 6px; font-size: 9px }
+    .goal-grid { gap: 9px }
+    .timer-display { margin: 25px 0; color: #f7f8ff; font: 400 clamp(65px, 10vw, 106px)/1 Georgia, "Times New Roman", serif; letter-spacing: -.04em }
+    .card.dark .timer-display { color: #f7f8ff }
+    .timer-controls { justify-content: center; gap: 8px }
+    .card.dark .button.primary { border-color: #f2f4fb; background: #f2f4fb; color: #11131a }
+    .card.dark .button:not(.primary) { border-color: #ffffff38; background: #ffffff06; color: #e8e8ec }
+    .card.dark .button:not(.primary):hover { background: #ffffff12 }
+    .focus-history-entry { gap: 13px; padding: 10px 0; border-color: #ffffff1c; font-size: 10px }
+    .sync-conflict { padding: 12px; border-color: #ffffff20; border-radius: 2px; background: #111216 }
+    .consent-row { gap: 9px; margin: 12px 0; color: #c2c3ca; font-size: 10px }
+    .consent-row input { width: 15px; height: 15px; flex: 0 0 auto }
+    .toast { right: 24px; bottom: 24px; padding: 11px 14px; border: 1px solid #ffffff35; border-radius: 2px; background: #10131a; box-shadow: 0 10px 40px rgb(0 0 0 / 42%); font-size: 10px }
+    .footer { margin-top: 24px; padding-top: 12px; border-color: #ffffff1c; color: #85868e; font-size: 8px }
+    :root[data-theme="dark"] body {
+      background:
+        radial-gradient(ellipse at 50% 46%, rgb(0 112 255 / 49%), transparent 29rem),
+        radial-gradient(ellipse at 50% 50%, #062c89 0, #061f60 39%, #03133c 100%);
+    }
+    :root[data-theme="dark"] .sidebar { border-color: #ffffff12; background: #050609; color: var(--ink) }
+    :root[data-theme="dark"] main { background: #07080b }
+    :root[data-theme="dark"] .wordmark h1 { color: #fff }
+    :root[data-theme="dark"] .wordmark p, :root[data-theme="dark"] .nav-group, :root[data-theme="dark"] .sidebar-note { color: #858790 }
+    :root[data-theme="dark"] .nav button { color: #abadb6 }
+    :root[data-theme="dark"] .nav button:hover { background: #ffffff0b; color: #fff }
+    :root[data-theme="dark"] .nav button.active { background: #ffffff0a; color: #fff; box-shadow: inset 2px 0 #b8cbff }
+    :root[data-theme="dark"] .kicker { color: #b8cbff }
+    :root[data-theme="dark"] .button { border-color: #ffffff29; background: transparent; color: #e3e3e7 }
+    :root[data-theme="dark"] .button:hover { border-color: #c0d0f6; background: #ffffff0d }
+    :root[data-theme="dark"] .button.primary { border-color: #f2f4fb; background: #f2f4fb; color: #10131d }
+    :root[data-theme="dark"] .card { border-color: #ffffff1b; background: linear-gradient(145deg, #101115, #0b0c10) }
+    :root[data-theme="dark"] .card:hover { border-color: #ffffff42; background: linear-gradient(145deg, #15161b, #101116) }
+    :root[data-theme="dark"] .card.tinted { border-color: #ffffff20; background: #12141b }
+    :root[data-theme="dark"] .card.dark { border-color: #454854; background: radial-gradient(ellipse at 78% 12%, rgb(156 178 234 / 15%), transparent 17rem), linear-gradient(135deg, #090a0e, #161821) }
+    :root[data-theme="dark"] .hero { background: radial-gradient(ellipse at 75% 48%, rgb(80 105 190 / 17%), transparent 23rem), linear-gradient(112deg, #050609, #0b0c10 70%, #0c0e15) }
+    :root[data-theme="dark"] .card h3 { color: #e9e8e4 }
+    :root[data-theme="dark"] .page-header h2 { color: #f3f2ef }
+    :root[data-theme="dark"] .metric { color: #efeff3 }
+    :root[data-theme="dark"] .field > span { color: #a0a1a8 }
+    :root[data-theme="dark"] .field input,
+    :root[data-theme="dark"] .field textarea,
+    :root[data-theme="dark"] .field select,
+    :root[data-theme="dark"] .time-slot input,
+    :root[data-theme="dark"] .date-input,
+    :root[data-theme="dark"] .table input:not([type="checkbox"]),
+    :root[data-theme="dark"] .table select { border-color: #ffffff20; background: #090a0d; color: #ececf0 }
+    :root[data-theme="dark"] .field input::placeholder, :root[data-theme="dark"] .field textarea::placeholder { color: #686a72 }
+    :root[data-theme="dark"] .calendar-day, :root[data-theme="dark"] .day-tile { border-color: #ffffff20; background: #0d0e12; color: #e9e9ed }
+    :root[data-theme="dark"] .calendar-day:hover, :root[data-theme="dark"] .calendar-day.selected { border-color: #9cb9ff; background: #171a24 }
+    :root[data-theme="dark"] .progress { background: #27282e }
+    :root[data-theme="dark"] .callout { border-color: #9ab8ff; background: #111319; color: #b2b4bd }
+    :root[data-theme="dark"] .callout.teal { border-color: #91adf2; background: #10131a; color: #c0c6d5 }
+    :root[data-theme="dark"] .pill { border-color: #ffffff20; background: #ffffff06; color: #c1cce3 }
+    :root[data-theme="dark"] .hero .pill { border: 0; background: transparent; color: #b5c5e8 }
+    :root[data-theme="dark"] .table td, :root[data-theme="dark"] .table th { border-color: #ffffff1b }
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --ink: #252633;
+      --navy: #252633;
+      --muted: #6f7280;
+      --paper: #fff;
+      --canvas: #f3f4f8;
+      --line: #dedfe7;
+      --teal: #355a9e;
+      --teal-pale: #e9eef8;
+      --gold: #375d9e;
+      --shadow: 0 12px 30px rgb(22 28 48 / 6%);
+    }
+    :root[data-theme="light"] .app { background: #f3f4f8 }
+    :root[data-theme="light"] main { background: #f7f7fa }
+    :root[data-theme="light"] .topbar { border-color: #dedfe7 }
+    :root[data-theme="light"] .topbar-note, :root[data-theme="light"] .page-header p { color: #6f7280 }
+    :root[data-theme="light"] .storage-status { border-color: #dedfe7; background: #fff; color: #696d7a }
+    :root[data-theme="light"] .button { border-color: #d7d9e2; background: #fff; color: #292b39 }
+    :root[data-theme="light"] .button:hover { border-color: #9fb3d5; background: #f5f7fb; color: #171a24 }
+    :root[data-theme="light"] .button.primary { border-color: #1b1c25; background: #1b1c25; color: #fff }
+    :root[data-theme="light"] .hero .button { border-color: #ffffff45; background: #ffffff05; color: #eeeef0 }
+    :root[data-theme="light"] .hero .button.primary { border-color: #f2f4fb; background: #f2f4fb; color: #11131a }
+    :root[data-theme="light"] .page-header h2 { color: #252633 }
+    :root[data-theme="light"] .card { border-color: #dedfe7; background: #fff }
+    :root[data-theme="light"] .card:hover { border-color: #bbc5d8; background: #fff }
+    :root[data-theme="light"] .card.tinted { border-color: #d9e1ef; background: #edf1f8 }
+    :root[data-theme="light"] .card h3, :root[data-theme="light"] .metric { color: #252633 }
+    :root[data-theme="light"] .card.dark { border-color: #454854; background: radial-gradient(ellipse at 78% 12%, rgb(156 178 234 / 15%), transparent 17rem), linear-gradient(135deg, #090a0e, #161821); color: #f1f1f4 }
+    :root[data-theme="light"] .card.dark h3 { color: #e8e8ed }
+    :root[data-theme="light"] .card.dark .small, :root[data-theme="light"] .card.dark .timer-status { color: #b7b9c3 }
+    :root[data-theme="light"] .small, :root[data-theme="light"] .check { color: #6f7280 }
+    :root[data-theme="light"] .field > span { color: #555968 }
+    :root[data-theme="light"] .field input,
+    :root[data-theme="light"] .field textarea,
+    :root[data-theme="light"] .field select,
+    :root[data-theme="light"] .time-slot input,
+    :root[data-theme="light"] .date-input,
+    :root[data-theme="light"] .table input:not([type="checkbox"]),
+    :root[data-theme="light"] .table select { border-color: #d8dbe4; background: #fafbfe; color: #252633 }
+    :root[data-theme="light"] .field input::placeholder, :root[data-theme="light"] .field textarea::placeholder { color: #898d9a }
+    :root[data-theme="light"] .calendar-day, :root[data-theme="light"] .day-tile { border-color: #dedfe7; background: #fff; color: #252633 }
+    :root[data-theme="light"] .calendar-day:hover, :root[data-theme="light"] .calendar-day.selected { border-color: #829bc5; background: #edf1f8 }
+    :root[data-theme="light"] .day-tile strong, :root[data-theme="light"] .calendar-day strong { color: #252633 }
+    :root[data-theme="light"] .callout { border-color: #829bc5; background: #f0f3f8; color: #555b69 }
+    :root[data-theme="light"] .callout.teal { background: #edf1f8; color: #4a5871 }
+    :root[data-theme="light"] .pill { border-color: #d6deed; background: #edf1f8; color: #465e85 }
+    :root[data-theme="light"] .hero .pill { border: 0; background: transparent; color: #b5c5e8 }
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 150px minmax(0, 1fr); width: calc(100% - 36px) }
+      .sidebar { padding-inline: 9px }
+      main { padding-inline: 20px }
+      .hero { min-height: 340px }
+      .hero > :not(.hero-art) { max-width: 62% }
+      .cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+    }
+    @media (max-width: 760px) {
+      .app { grid-template-columns: 145px minmax(0, 1fr); width: calc(100% - 24px) }
+      main { padding-inline: 16px }
+      .cols-2 { grid-template-columns: 1fr }
+      .topbar { align-items: flex-start }
+      .actions { max-width: 100% }
+      .hero::before { display: none }
+      .hero-art { right: 0; width: 36%; opacity: .78 }
+      .hero > :not(.hero-art) { max-width: 72% }
+      .hero h2 { font-size: clamp(29px, 5vw, 39px) }
+    }
+    @media (max-width: 650px) {
+      body { background: radial-gradient(ellipse at 50% 15%, #0751c4, #041b51 55%, #03133c) }
+      .app {
+        display: block;
+        width: calc(100% - 16px);
+        min-height: calc(100vh - 16px);
+        margin: 8px auto;
+        border-radius: 10px;
+      }
+      .sidebar {
+        position: sticky;
+        z-index: 5;
+        top: 0;
+        height: auto;
+        padding: 9px 11px 8px;
+        border-right: 0;
+        border-bottom: 1px solid #ffffff1c;
+        background: rgb(7 8 10 / 96%);
+        backdrop-filter: blur(12px);
+      }
+      .wordmark { padding: 0 4px 4px; border: 0 }
+      .wordmark small, .wordmark p, .sidebar-note, .nav-group { display: none }
+      .wordmark h1 { margin: 0; font-size: 20px }
+      .nav { display: flex; gap: 2px; overflow-x: auto; padding: 7px 0 1px; scrollbar-width: none }
+      .nav::-webkit-scrollbar { display: none }
+      .nav button { width: auto; min-height: 33px; flex: 0 0 auto; padding: 6px 8px; border-radius: 1px; white-space: nowrap; font-size: 9px }
+      .nav button:hover { padding-left: 8px }
+      .nav button.active { box-shadow: inset 0 -2px #a8c1ff }
+      :root[data-theme="dark"] .sidebar { background: rgb(5 6 9 / 97%) }
+      main { padding: 17px 12px 32px }
+      .topbar { flex-direction: column; gap: 10px; margin-bottom: 18px; padding-bottom: 9px }
+      .actions { justify-content: flex-start; gap: 5px }
+      .storage-status { order: -1 }
+      .button { min-height: 34px; padding-inline: 8px; font-size: 9px }
+      .page-header { align-items: flex-start; gap: 8px; margin-bottom: 15px }
+      .page-header h2 { font-size: clamp(29px, 9vw, 39px) }
+      .page-header p { font-size: 9px }
+      .folio { padding-top: 19px; font-size: 7px }
+      .hero { min-height: 390px; padding: 22px 18px; border-radius: 2px }
+      .hero::before { top: 16%; right: 4%; width: 65%; opacity: .8 }
+      .hero-art { inset: auto -8% -4% auto; width: 70%; height: 65%; opacity: .38 }
+      .hero-art-caption { right: 9%; bottom: 6% }
+      .hero::before { display: none }
+      .hero > :not(.hero-art) { max-width: 94% }
+      .hero .kicker { margin-bottom: auto }
+      .hero h2 { max-width: 91%; margin-top: 13px; font-size: clamp(34px, 10vw, 47px) }
+      .hero p { max-width: 92%; font-size: 9px }
+      .hero .row { gap: 6px }
+      .hero .pill { flex-basis: 100%; padding-left: 0 }
+      .grid { gap: 8px }
+      .cols-2, .cols-3, .cols-4, .goal-grid { grid-template-columns: 1fr }
+      .card { padding: 13px }
+      .page-home > .cols-4 .card { min-height: 79px }
+      .week-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px }
+      .day-tile { min-height: 66px; padding: 6px 3px }
+      .day-tile strong { font-size: 8px }
+      .day-tile .button { min-height: 22px; padding: 2px 4px; font-size: 7px }
+      .calendar { gap: 2px }
+      .calendar-day { min-height: 47px; padding: 3px }
+      .calendar-day strong { font-size: 9px }
+      .calendar-day small { margin-top: 2px; font-size: 6px }
+      .time-grid { grid-template-columns: 1fr }
+      .timer-display { font-size: clamp(57px, 17vw, 78px) }
+      .focus-history-entry { flex-direction: column; gap: 3px }
+      .table { min-width: 570px }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important }
+    }
+    @media print {
+      body { background: #fff; color: #222 }
+      .app { width: 100%; margin: 0; border: 0; border-radius: 0; background: #fff; box-shadow: none }
+      .sidebar { background: #fff; color: #222 }
+      main { background: #fff }
+      .card, .hero { border-color: #ddd; background: #fff; color: #222; box-shadow: none }
+      .page-header h2, .card h3 { color: #222 }
+    }
   </style>
 </head>
 <body>
@@ -268,6 +737,36 @@
           <h2>Make a little progress.<br>Make it your own.</h2>
           <p>One private, adaptable space for the goals you care about, the work in front of you and the time you need to feel well.</p>
           <div class="row"><button class="button primary" data-go="day">Plan today</button><button class="button" data-go="pomodoro">Start a focus block</button><button class="button" data-go="goals">Shape a goal</button><span class="pill">Free · no ads · your choice to sync</span></div>
+          <div class="hero-art" aria-hidden="true">
+            <svg viewBox="0 0 420 360" focusable="false">
+              <defs>
+                <radialGradient id="orb" cx="36%" cy="28%" r="74%">
+                  <stop offset="0" stop-color="#b3c9ff"/>
+                  <stop offset=".34" stop-color="#59648f"/>
+                  <stop offset=".72" stop-color="#171923"/>
+                  <stop offset="1" stop-color="#050609"/>
+                </radialGradient>
+                <linearGradient id="orbit" x1="0" y1="0" x2="1" y2="1">
+                  <stop stop-color="#fff"/>
+                  <stop offset=".46" stop-color="#9cbdff"/>
+                  <stop offset="1" stop-color="#4f79ff" stop-opacity=".08"/>
+                </linearGradient>
+                <filter id="orb-glow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="13" result="blur"/>
+                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <circle cx="216" cy="169" r="132" fill="none" stroke="url(#orbit)" stroke-width="5" filter="url(#orb-glow)"/>
+              <ellipse cx="215" cy="279" rx="118" ry="25" fill="#7288ee" opacity=".16"/>
+              <circle cx="218" cy="174" r="91" fill="url(#orb)"/>
+              <path d="M167 102c-25 16-43 43-47 74-5 43 19 83 58 100-23-23-31-51-27-82 4-36 25-63 56-82-12-10-25-13-40-10Z" fill="#e1e9ff" opacity=".18"/>
+              <path d="M117 185c23-19 38-45 47-76" fill="none" stroke="#fff" stroke-opacity=".34" stroke-width="2"/>
+              <path d="M146 281c36 17 95 17 135-1" fill="none" stroke="#b7caff" stroke-opacity=".45" stroke-width="1.5"/>
+              <circle cx="328" cy="100" r="3" fill="#fff"/>
+              <circle cx="88" cy="219" r="2" fill="#a8bdff"/>
+            </svg>
+            <div class="hero-art-caption"><span>YOUR OWN RHYTHM</span><strong>Make space<br>for what matters.</strong></div>
+          </div>
         </div>
         <div class="grid cols-4">
           <div class="card"><div class="metric" id="todayMetric">—</div><div class="metric-label">Today</div></div>
@@ -345,13 +844,21 @@
             <p class="small">No answer is wrong. You can begin even if you do not feel ready.</p>
           </div>
         </div>
+        <div class="card" id="desktopBlocker">
+          <h3>Apps to close during focus</h3>
+          <p class="small">In Daymark Desktop, you can ask selected apps to close while a focus timer is running. Save your work first: an app may lose unsaved changes, ignore the close request, or reopen. This is a best-effort focus aid, not a tamper-proof app restriction.</p>
+          <label class="consent-row"><input id="blockAppsEnabled" type="checkbox"><span>Ask Daymark Desktop to close the selected apps during active focus blocks</span></label>
+          <div class="row no-print"><button class="button" id="refreshDesktopApps" type="button">Refresh running apps</button></div>
+          <div class="checklist" id="desktopAppsList" aria-live="polite"></div>
+          <p class="small" id="desktopBlockerStatus" role="status" aria-live="polite">App closing is available only in Daymark Desktop. The browser version cannot manage other apps.</p>
+        </div>
         <div class="card" id="postSessionReflection" style="margin-top:13px" hidden>
           <h3>A gentle check-in · optional</h3>
           <p class="small">Choose a non-personal note about the experience, or skip it. The choice is saved with the focus history; no task text or free-form reflection is collected.</p>
           <label class="field"><span>What best describes this block?</span><select id="focusReflection"><option value="">Choose one or skip</option><option value="clear-step">The first step felt clear</option><option value="interrupted">I was interrupted</option><option value="plan-changed">I needed a different plan</option><option value="kept-going">I stayed with it</option><option value="needed-rest">I needed more rest</option></select></label>
           <div class="row"><button class="button primary" id="saveFocusReflection" type="button">Save check-in</button><button class="button" id="skipFocusReflection" type="button">Skip</button></div>
         </div>
-        <div class="callout teal">Daymark runs in your browser and cannot block other apps or websites. It does not request device-control permissions. If blocking helps, use built-in focus settings on your device separately.</div>
+        <div class="callout teal">Daymark Desktop can request that selected apps close during an active focus block. The browser version cannot control other apps or websites, and desktop app closing is best-effort rather than a system restriction.</div>
         <div class="separator">Your focus history</div>
         <div class="card"><div class="small">Saved on this device; included in account sync when enabled. Task names are never included.</div><div class="focus-history" id="focusHistory" aria-live="polite"></div></div>
         <div class="callout">After a focus block, take a kind check-in: What helped? What got in the way? What is one small next step? Stopping early is useful information, not a failure.</div>
@@ -486,6 +993,21 @@
       let pomodoroTick = 0;
       let awaitingReflection = false;
       let lastFocusRecordKey = "";
+      const desktopBridge = window.daymarkDesktopBridge || null;
+      const DESKTOP_BLOCKER_SETTINGS_KEY = "daymark-desktop-app-blocker-v1";
+      const desktopBlockerSettings = (() => {
+        try {
+          const stored = JSON.parse(localStorage.getItem(DESKTOP_BLOCKER_SETTINGS_KEY) || "null");
+          return {
+            enabled: stored?.enabled === true,
+            processNames: Array.isArray(stored?.processNames)
+              ? [...new Set(stored.processNames.filter(name => typeof name === "string" && /^[\p{L}\p{N}_. ,()-]{1,128}$/u.test(name)))].slice(0, 50)
+              : []
+          };
+        } catch {
+          return { enabled: false, processNames: [] };
+        }
+      })();
       const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
       let theme = data._theme || (prefersDark ? "dark" : "light");
       let selectedDate = new Date();
@@ -776,6 +1298,92 @@
         }
       }
 
+      function setDesktopBlockerStatus(message, isError = false) {
+        const status = byId("desktopBlockerStatus");
+        status.textContent = message;
+        status.className = isError ? "small error" : "small";
+      }
+
+      function saveDesktopBlockerSettings() {
+        try {
+          localStorage.setItem(DESKTOP_BLOCKER_SETTINGS_KEY, JSON.stringify(desktopBlockerSettings));
+          return true;
+        } catch (error) {
+          setDesktopBlockerStatus(`Could not save your app list on this device: ${error.message}`, true);
+          return false;
+        }
+      }
+
+      async function refreshDesktopApps() {
+        if (!desktopBridge) return;
+        const list = byId("desktopAppsList");
+        list.textContent = "Reading running app names on this device…";
+        try {
+          const running = await desktopBridge.listRunningApps();
+          const names = [...new Set([
+            ...running.map(app => app.name),
+            ...desktopBlockerSettings.processNames
+          ])].sort((left, right) => left.localeCompare(right));
+          list.innerHTML = names.length
+            ? names.map(name => `<label class="check"><input type="checkbox" data-block-process="${escapeHtml(name)}"${desktopBlockerSettings.processNames.includes(name) ? " checked" : ""}><span>${escapeHtml(name)}</span></label>`).join("")
+            : '<span class="small">No user apps are running right now.</span>';
+          list.querySelectorAll("[data-block-process]").forEach(input => {
+            input.addEventListener("change", () => {
+              const name = input.dataset.blockProcess;
+              const selected = new Set(desktopBlockerSettings.processNames);
+              if (input.checked) selected.add(name);
+              else selected.delete(name);
+              desktopBlockerSettings.processNames = [...selected];
+              if (saveDesktopBlockerSettings()) void updateDesktopBlocking();
+            });
+          });
+        } catch (error) {
+          list.textContent = "";
+          setDesktopBlockerStatus(`Could not read running apps: ${error.message}`, true);
+        }
+      }
+
+      async function updateDesktopBlocking() {
+        if (!desktopBridge) return;
+        const active = desktopBlockerSettings.enabled
+          && desktopBlockerSettings.processNames.length > 0
+          && pomodoroSession?.kind === "focus"
+          && !pomodoroSession.paused;
+        try {
+          await desktopBridge.setFocusBlocking({
+            active: Boolean(active),
+            processNames: desktopBlockerSettings.processNames
+          });
+          if (!active && desktopBlockerSettings.enabled && !desktopBlockerSettings.processNames.length) {
+            setDesktopBlockerStatus("Choose at least one app before starting a focus block.");
+          } else if (!active) {
+            setDesktopBlockerStatus("Selected apps are not being closed. Blocking runs only during an active focus timer.");
+          }
+        } catch (error) {
+          setDesktopBlockerStatus(`Could not update desktop app blocking: ${error.message}`, true);
+        }
+      }
+
+      function initializeDesktopBlocker() {
+        const enabled = byId("blockAppsEnabled");
+        const refresh = byId("refreshDesktopApps");
+        if (!desktopBridge) {
+          enabled.disabled = true;
+          refresh.disabled = true;
+          return;
+        }
+        enabled.checked = desktopBlockerSettings.enabled;
+        enabled.addEventListener("change", () => {
+          desktopBlockerSettings.enabled = enabled.checked;
+          if (saveDesktopBlockerSettings()) void updateDesktopBlocking();
+        });
+        refresh.addEventListener("click", () => { void refreshDesktopApps(); });
+        desktopBridge.onFocusBlockingStatus(message => setDesktopBlockerStatus(message));
+        setDesktopBlockerStatus("App names stay on this device. Selected apps receive a graceful close request only during active focus blocks.");
+        void refreshDesktopApps();
+        void updateDesktopBlocking();
+      }
+
       function renderFocusHistory() {
         const reflectionLabels = {
           "clear-step": "first step felt clear",
@@ -838,6 +1446,7 @@
           checkIn: kind === "focus" ? byId("focusCheckin").value : ""
         };
         savePomodoroSession();
+        void updateDesktopBlocking();
         byId("timerStatus").textContent = kind === "focus"
           ? "Your focus block has started. Pause or end it whenever you need."
           : "Take this break in whatever way feels restorative.";
@@ -884,6 +1493,7 @@
         pomodoroSession = null;
         clearInterval(pomodoroTick);
         savePomodoroSession();
+        void updateDesktopBlocking();
         renderPomodoro();
         renderFocusHistory();
       }
@@ -912,6 +1522,7 @@
         pomodoroSession.remainingMs = core.timerRemaining(pomodoroSession);
         pomodoroSession.paused = true;
         savePomodoroSession();
+        void updateDesktopBlocking();
         clearInterval(pomodoroTick);
         byId("timerStatus").textContent = "Paused. You can resume or end this session.";
         renderPomodoro();
@@ -921,6 +1532,7 @@
         pomodoroSession.paused = false;
         pomodoroSession.endsAt = Date.now() + pomodoroSession.remainingMs;
         savePomodoroSession();
+        void updateDesktopBlocking();
         byId("timerStatus").textContent = "Resumed. Pause or end it whenever you need.";
         renderPomodoro();
         pomodoroTick = setInterval(updatePomodoro, 1000);
@@ -950,6 +1562,8 @@
         renderPomodoro();
       });
       document.addEventListener("visibilitychange", updatePomodoro);
+      byId("blockAppsEnabled").checked = desktopBlockerSettings.enabled;
+      initializeDesktopBlocker();
 
       function syncStatus(message, isError = false) {
         byId("syncStatus").textContent = message;
@@ -1844,6 +2458,7 @@
       renderHabitGrid();
       pomodoroSession = readPomodoroSession();
       renderPomodoro();
+      void updateDesktopBlocking();
       renderFocusHistory();
       renderSyncPanel();
       if (pomodoroSession) {
