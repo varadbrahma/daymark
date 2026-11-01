@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "Daymark — a planner for your life",
+  "short_name": "Daymark",
+  "description": "A thoughtful planner for study, focus, goals, routines and everyday life.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f2eb",
+  "theme_color": "#172d3d",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

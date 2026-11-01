@@ -1,0 +1,1865 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#172d3d">
+  <meta name="description" content="A thoughtful planner for study, goals, focus, routines and everyday life.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>Daymark — a planner for your life</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #263640;
+      --navy: #172d3d;
+      --muted: #78838a;
+      --paper: #fffefa;
+      --canvas: #f5f2eb;
+      --line: #e6e1d7;
+      --teal: #63877f;
+      --teal-pale: #eaf0ed;
+      --gold: #ba9b63;
+      --shadow: 0 8px 26px rgb(23 45 61 / 5%);
+      --radius: 10px;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --ink: #e4e9e7;
+      --navy: #dce5e2;
+      --muted: #a4b0b2;
+      --paper: #1d2b32;
+      --canvas: #121d23;
+      --line: #35454b;
+      --teal: #91b7ad;
+      --teal-pale: #263b3d;
+      --gold: #d2b878;
+      --shadow: 0 8px 26px rgb(0 0 0 / 14%);
+    }
+    * { box-sizing: border-box }
+    html { scroll-behavior: smooth }
+    body { margin: 0; background: var(--canvas); color: var(--ink); font: 14px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif }
+    button, input, textarea, select { font: inherit }
+    button { color: inherit }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 252px minmax(0, 1fr) }
+    .sidebar { position: sticky; inset-block-start: 0; height: 100vh; overflow-y: auto; padding: 22px 15px; background: var(--navy); color: #eef2ef }
+    .wordmark { padding: 9px 12px 19px; border-bottom: 1px solid #ffffff20 }
+    .wordmark small { color: #d7bd85; font-size: 10px; font-weight: 750; letter-spacing: .22em; text-transform: uppercase }
+    .wordmark h1 { margin: 9px 0 3px; color: #fff; font: 500 29px/1 Georgia, "Times New Roman", serif }
+    .wordmark p { margin: 0; color: #b7c5c6; font-size: 11px }
+    .nav-group { margin: 19px 0 7px 12px; color: #93a8ab; font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase }
+    .nav { display: grid; gap: 3px }
+    .nav button { width: 100%; padding: 9px 11px; border: 0; border-radius: 6px; background: transparent; color: #c9d2d1; text-align: left; font-size: 12px; cursor: pointer }
+    .nav button:hover, .nav button.active { background: #ffffff12; color: white }
+    .nav button.active { box-shadow: inset 2px 0 var(--gold) }
+    .sidebar-note { margin: 22px 12px 5px; color: #a7b5b6; font-size: 10px }
+    main { min-width: 0; padding: 26px clamp(16px, 4vw, 56px) 55px }
+    .topbar, .page { width: min(1120px, 100%); margin-inline: auto }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px }
+    .kicker { color: var(--teal); font-size: 10px; font-weight: 750; letter-spacing: .17em; text-transform: uppercase }
+    .topbar-note { margin-top: 3px; color: var(--muted); font-size: 11px }
+    .actions, .row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px }
+    .button { min-height: 35px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--navy); font-size: 11px; font-weight: 650; cursor: pointer }
+    .button:hover { border-color: var(--teal); background: var(--teal-pale) }
+    .button.primary { border-color: var(--navy); background: var(--navy); color: white }
+    .button.primary:hover { background: #294858 }
+    .theme-toggle { min-width: 90px }
+    .button:focus-visible, .nav button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, .calendar-day:focus-visible { outline: 3px solid #79a49c; outline-offset: 2px }
+    .page { display: none }
+    .page.active { display: block }
+    .page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 0 0 22px; padding-bottom: 16px; border-bottom: 1px solid var(--line) }
+    .page-header h2 { margin: 5px 0 7px; color: var(--navy); font: 500 clamp(29px, 4vw, 42px)/1.08 Georgia, "Times New Roman", serif }
+    .page-header p { max-width: 740px; margin: 0; color: var(--muted); font-size: 12px }
+    .folio { color: var(--gold); font: italic 14px Georgia, serif; white-space: nowrap }
+    .hero { position: relative; overflow: hidden; margin-bottom: 14px; padding: clamp(24px, 4vw, 41px); border-radius: 12px; background: linear-gradient(115deg, #172d3d, #315c61); color: white; box-shadow: var(--shadow) }
+    .hero::after { position: absolute; inset: -130px -95px auto auto; width: 350px; height: 350px; border: 1px solid #ffffff20; border-radius: 50%; box-shadow: 0 0 0 34px #ffffff08, 0 0 0 70px #ffffff05; content: "" }
+    .hero .kicker { color: #e0c989 }
+    .hero h2 { position: relative; z-index: 1; max-width: 660px; margin: 10px 0; font: 500 clamp(35px, 5vw, 57px)/1.02 Georgia, "Times New Roman", serif }
+    .hero p { position: relative; z-index: 1; max-width: 630px; margin: 0 0 17px; color: #d6e0de; font-size: 13px }
+    .hero .row { position: relative; z-index: 1 }
+    .hero .button { border-color: #ffffff30; background: #ffffff0c; color: white }
+    .hero .button.primary { border-color: var(--gold); background: var(--gold) }
+    .grid { display: grid; gap: 13px }
+    .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+    .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+    .cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)) }
+    .card { min-width: 0; padding: 16px 17px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); box-shadow: var(--shadow) }
+    .card.tinted { border-color: #dce6e1; background: var(--teal-pale); box-shadow: none }
+    .card.dark { border-color: var(--navy); background: var(--navy); color: #edf2ef }
+    .card.dark h3 { color: #efdbad }
+    .card h3 { margin: 0 0 10px; color: var(--navy); font: 600 15px Georgia, "Times New Roman", serif }
+    .card p { margin: 5px 0 }
+    .metric { color: var(--navy); font: 500 27px Georgia, serif }
+    .metric-label { color: var(--muted); font-size: 9px; letter-spacing: .12em; text-transform: uppercase }
+    .small { color: var(--muted); font-size: 10px }
+    .card.dark .small { color: #c0ccca }
+    .separator { display: flex; align-items: center; gap: 10px; margin: 22px 0 11px; color: var(--gold); font: italic 14px Georgia, serif }
+    .separator::after { height: 1px; flex: 1; background: var(--line); content: "" }
+    .field { display: block; margin: 10px 0 }
+    .field > span { display: block; margin-bottom: 5px; color: #6d7a80; font-size: 9px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase }
+    .field input, .field textarea, .field select, .time-slot input, .date-input { width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 5px; background: #fffefa; color: var(--ink); font-size: 12px }
+    .field textarea { min-height: 75px; resize: vertical; line-height: 1.5 }
+    .field input:focus, .field textarea:focus, .field select:focus, .time-slot input:focus { border-color: var(--teal); outline: none; box-shadow: 0 0 0 2px #63877f1a }
+    .field input::placeholder, .field textarea::placeholder { color: #9aa2a4 }
+    .checklist { display: grid; gap: 8px }
+    .check { display: flex; align-items: flex-start; gap: 9px; font-size: 11px; line-height: 1.45 }
+    .check input, .table input[type="checkbox"] { width: 15px; height: 15px; flex: 0 0 auto; margin: 1px 0 0; accent-color: var(--teal) }
+    .progress { height: 6px; overflow: hidden; margin: 10px 0 5px; border-radius: 10px; background: #e8e5de }
+    .progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--teal); transition: width .2s }
+    .callout { margin: 12px 0; padding: 10px 13px; border-left: 3px solid var(--gold); background: #f4efe4; color: #58656a; font-size: 11px }
+    .callout.teal { border-color: var(--teal); background: var(--teal-pale) }
+    .table-wrap { overflow-x: auto }
+    .table { width: 100%; border-collapse: collapse; font-size: 10px }
+    .table th { padding: 8px 6px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 8px; letter-spacing: .09em; text-align: left; text-transform: uppercase }
+    .table td { padding: 7px 6px; border-bottom: 1px solid #efede7; vertical-align: middle }
+    .table td:first-child { color: var(--navy); font-weight: 650 }
+    .table input:not([type="checkbox"]), .table select { width: 100%; min-width: 90px; padding: 7px; border: 1px solid var(--line); border-radius: 4px; background: #fffefa; font-size: 10px }
+    .week-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px }
+    .day-tile { min-height: 76px; padding: 8px 5px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); text-align: center }
+    .day-tile strong { display: block; color: var(--navy); font: 500 11px Georgia, serif }
+    .day-tile span { color: var(--muted); font-size: 9px }
+    .day-tile .button { margin-top: 6px; padding: 4px 7px; font-size: 9px }
+    .time-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px }
+    .time-slot { display: grid; grid-template-columns: 53px minmax(0, 1fr); align-items: center; gap: 7px }
+    .time-slot label { color: var(--muted); font-size: 10px; font-weight: 650 }
+    .time-slot input { padding: 7px 8px; font-size: 11px }
+    .calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px }
+    .calendar-head { padding: 4px; color: var(--muted); font-size: 8px; letter-spacing: .09em; text-align: center; text-transform: uppercase }
+    .calendar-day { min-height: 68px; padding: 6px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); text-align: left; cursor: pointer }
+    .calendar-day:hover, .calendar-day.selected { border-color: var(--teal); background: var(--teal-pale) }
+    .calendar-day.outside { opacity: .43 }
+    .calendar-day strong { color: var(--navy); font: 500 12px Georgia, serif }
+    .calendar-day small { display: block; margin-top: 7px; color: var(--teal); font-size: 8px }
+    .goal-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+    .progress-row { display: flex; align-items: center; gap: 10px }
+    .progress-row .progress { flex: 1 }
+    .pill { display: inline-block; padding: 4px 8px; border-radius: 30px; background: var(--teal-pale); color: #42685f; font-size: 9px; font-weight: 700 }
+    .footer { margin-top: 23px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px }
+    .toast { position: fixed; inset: auto 18px 18px auto; z-index: 5; padding: 10px 14px; border-radius: 6px; background: var(--navy); color: white; font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: .2s }
+    .toast.visible { opacity: 1; transform: translateY(0) }
+    .storage-status { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px }
+    .storage-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal) }
+    .storage-status.warning .storage-dot { background: var(--gold) }
+    .storage-status.error .storage-dot { background: #c65e52 }
+    .install-button[hidden] { display: none }
+    .loading-cover { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: var(--canvas); color: var(--navy); font: 16px Georgia, serif }
+    .loading-cover[hidden] { display: none }
+    .journal-entry { white-space: pre-wrap; overflow-wrap: anywhere }
+    .timer-display { margin: 16px 0; color: var(--navy); font: 500 clamp(54px, 10vw, 88px)/1 Georgia, "Times New Roman", serif; letter-spacing: .03em; text-align: center; font-variant-numeric: tabular-nums }
+    .timer-controls { justify-content: center }
+    .timer-status { min-height: 1.6em; color: var(--muted); text-align: center }
+    .card.dark .timer-status { color: #d6e0de }
+    .small.error { color: #b24b44 }
+    .focus-history { display: grid; gap: 8px; max-height: 270px; overflow-y: auto }
+    .focus-history-entry { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 11px }
+    .sync-conflict { margin-top: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper) }
+    .sync-conflict p { overflow-wrap: anywhere }
+    .consent-row { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0; font-size: 11px }
+    .consent-row input { margin-top: 3px }
+    :root[data-theme="dark"] body { color: var(--ink) }
+    :root[data-theme="dark"] .sidebar { background: #101a20 }
+    :root[data-theme="dark"] .wordmark h1,
+    :root[data-theme="dark"] .nav button.active,
+    :root[data-theme="dark"] .nav button:hover { color: #fff }
+    :root[data-theme="dark"] .hero { background: linear-gradient(115deg, #10232e, #234449) }
+    :root[data-theme="dark"] .card.dark { background: #10232e; border-color: #30444b }
+    :root[data-theme="dark"] .field input,
+    :root[data-theme="dark"] .field textarea,
+    :root[data-theme="dark"] .field select,
+    :root[data-theme="dark"] .time-slot input,
+    :root[data-theme="dark"] .date-input,
+    :root[data-theme="dark"] .table input:not([type="checkbox"]),
+    :root[data-theme="dark"] .table select,
+    :root[data-theme="dark"] .calendar-day,
+    :root[data-theme="dark"] .day-tile {
+      background: #18262d;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+    :root[data-theme="dark"] .field input::placeholder,
+    :root[data-theme="dark"] .field textarea::placeholder,
+    :root[data-theme="dark"] .time-slot input::placeholder { color: #91a0a4 }
+    :root[data-theme="dark"] .calendar-day:hover,
+    :root[data-theme="dark"] .calendar-day.selected { background: var(--teal-pale); border-color: var(--teal) }
+    :root[data-theme="dark"] .callout { background: #302d25; color: #d7d2c4 }
+    :root[data-theme="dark"] .callout.teal { background: var(--teal-pale); color: #d4dfd9 }
+    :root[data-theme="dark"] .table td { border-color: #2e3b41 }
+    :root[data-theme="dark"] .table th { border-color: var(--line) }
+    :root[data-theme="dark"] .metric { color: #e0c989 }
+    :root[data-theme="dark"] .progress { background: #344247 }
+    :root[data-theme="dark"] .button.primary { background: #294858; border-color: #45636d }
+    :root[data-theme="dark"] .pill { background: var(--teal-pale); color: #c3ded5 }
+    :root[data-theme="dark"] .card.tinted { border-color: #354b48 }
+    @media (max-width: 900px) { .app { grid-template-columns: 206px minmax(0, 1fr) } .sidebar { padding: 17px 10px } .cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) } .cols-3, .goal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+    @media (max-width: 650px) {
+      .app { display: block }
+      .sidebar { position: relative; height: auto; padding: 12px }
+      .wordmark { padding: 4px 8px 10px }
+      .wordmark h1 { margin: 5px 0; font-size: 23px }
+      .wordmark p, .sidebar-note, .nav-group { display: none }
+      .nav { display: flex; gap: 5px; overflow-x: auto; padding-top: 8px }
+      .nav button { width: auto; flex: 0 0 auto; white-space: nowrap }
+      .nav button.active { box-shadow: inset 0 -2px var(--gold) }
+      main { padding: 15px 12px 32px }
+      .topbar { align-items: stretch; flex-direction: column; margin-bottom: 15px }
+      .actions { flex-wrap: wrap }
+      .cols-2, .cols-3, .cols-4, .goal-grid { grid-template-columns: 1fr }
+      .page-header { align-items: flex-start }
+      .time-grid { grid-template-columns: 1fr }
+      .day-tile { min-height: 67px; padding-inline: 2px }
+      .day-tile strong { font-size: 9px }
+      .calendar { gap: 3px }
+      .calendar-day { min-height: 52px; padding: 4px }
+    }
+    @page { size: A4; margin: 13mm }
+    @media print {
+      body { background: white; font-size: 10pt }
+      .app { display: block }
+      .sidebar, .topbar, .no-print, .toast { display: none !important }
+      main { padding: 0 }
+      .page { display: none !important }
+      .page.active { display: block !important; width: 100% }
+      .page-header { margin-bottom: 12px }
+      .page-header h2 { font-size: 25pt }
+      .card, .hero { break-inside: avoid; box-shadow: none }
+      .hero, .card.dark { -webkit-print-color-adjust: exact; print-color-adjust: exact }
+      .field textarea { min-height: 48px }
+      .footer { margin-top: 10px }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="wordmark"><small>Make room for what matters</small><h1>Daymark</h1><p>A calm place to plan your next steps.</p></div>
+      <div class="nav-group">Your workspace</div>
+      <nav class="nav" aria-label="Planner navigation">
+        <button class="active" data-page="home" aria-current="page">⌂ &nbsp; Overview</button>
+        <button data-page="diary">◷ &nbsp; Life diary</button>
+        <button data-page="goals">01 &nbsp; Goals &amp; roadmap</button>
+        <button data-page="day">02 &nbsp; Daily plan</button>
+        <button data-page="pomodoro">03 &nbsp; Focus &amp; study</button>
+        <button data-page="week">04 &nbsp; Week</button>
+        <button data-page="month">05 &nbsp; Month</button>
+        <button data-page="projects">06 &nbsp; Projects &amp; tasks</button>
+        <button data-page="wellbeing">07 &nbsp; Wellbeing</button>
+        <button data-page="review">08 &nbsp; Review &amp; habits</button>
+        <button data-page="settings">09 &nbsp; Preferences</button>
+      </nav>
+      <div class="sidebar-note">Progress is personal.<br>Plan lightly. Begin again anytime.</div>
+    </aside>
+    <main>
+      <div class="topbar">
+        <div><div class="kicker">A flexible planner for everyday life</div><div class="topbar-note" id="greeting">Your goals, time and energy — in one place.</div></div>
+        <div class="actions">
+          <div class="storage-status" id="storageStatus" role="status"><span class="storage-dot"></span><span id="storageLabel">Opening private storage…</span></div>
+          <button class="button install-button" id="installButton" type="button" hidden>Install app</button>
+          <button class="button theme-toggle" id="themeToggle" type="button" aria-pressed="false">Dark mode</button>
+          <button class="button" id="backupButton" title="Download a backup of this browser's saved planner data">Export backup</button>
+          <button class="button" id="restoreButton">Import backup</button>
+          <input id="backupFile" type="file" accept="application/json,.json" hidden>
+          <button class="button primary" id="printButton">Print / Save PDF</button>
+        </div>
+      </div>
+
+      <section class="page active" id="page-home" data-scope="home">
+        <div class="hero">
+          <div class="kicker">A fresh start, whenever you need one</div>
+          <h2>Make a little progress.<br>Make it your own.</h2>
+          <p>One private, adaptable space for the goals you care about, the work in front of you and the time you need to feel well.</p>
+          <div class="row"><button class="button primary" data-go="day">Plan today</button><button class="button" data-go="pomodoro">Start a focus block</button><button class="button" data-go="goals">Shape a goal</button><span class="pill">Free · no ads · your choice to sync</span></div>
+        </div>
+        <div class="grid cols-4">
+          <div class="card"><div class="metric" id="todayMetric">—</div><div class="metric-label">Today</div></div>
+          <div class="card"><div class="metric">One</div><div class="metric-label">Next useful step</div><div class="small">Small enough to start.</div></div>
+          <div class="card"><div class="metric">Your pace</div><div class="metric-label">Progress that lasts</div><div class="small">Rest and change belong here.</div></div>
+          <div class="card"><div class="metric">Yours</div><div class="metric-label">Your choice</div><div class="small">Local, or account sync when configured.</div></div>
+        </div>
+        <div class="separator">A glance at your week</div>
+        <div class="card"><div class="week-grid" id="overviewWeek"></div></div>
+        <div class="grid cols-3" style="margin-top:13px">
+          <div class="card tinted"><h3>Choose what matters</h3><p class="small">Set a direction, name the next action and leave room for life to change.</p><div style="margin-top:12px"><button class="button" data-go="goals">Explore goals →</button></div></div>
+          <div class="card"><h3>Make time visible</h3><p class="small">Shape the day around your real commitments. Empty time can stay empty.</p><div style="margin-top:12px"><button class="button" data-go="week">Plan your week →</button></div></div>
+          <div class="card"><h3>Take care of yourself</h3><p class="small">Wellbeing is part of the plan—not something you earn after finishing it.</p><div style="margin-top:12px"><button class="button" data-go="wellbeing">Open wellbeing →</button></div></div>
+        </div>
+        <div class="callout teal">Your diary stays on this device unless you choose account sync in Preferences. Export a backup regularly, especially before clearing site data.</div>
+      </section>
+
+      <section class="page" id="page-diary" data-scope="diary">
+        <header class="page-header"><div><div class="kicker">A record of your days</div><h2>Life diary</h2><p>Daily entries are saved in this browser and can build into a searchable personal archive. If you choose account sync in Preferences, entries are also sent to that configured account backend.</p></div><div class="folio">YOUR ARCHIVE</div></header>
+        <div class="grid cols-2">
+          <div class="card"><h3>Write an entry</h3><label class="field"><span>Entry date</span><input id="diaryDate" type="date"></label><label class="field"><span>Today, in your own words</span><textarea id="diaryText" placeholder="A moment, a thought, something you learned, or anything you want to remember." style="min-height:180px"></textarea></label><div class="row"><button class="button primary" id="saveDiary">Save entry</button><button class="button" id="openDiaryDay">Open this date's daily plan</button></div><p class="small">Saved locally first. Account sync is optional and sends diary text to the configured backend only after you sign in and sync.</p></div>
+          <div class="card tinted"><h3>Years of memories, one entry at a time</h3><p class="small">Write when it is useful; no streak or daily requirement. Search your saved entries, export a full backup, and keep another copy somewhere private.</p><div class="separator">A few gentle prompts</div><div class="checklist"><span class="small">What would I like to remember about today?</span><span class="small">What felt meaningful, surprising, or difficult?</span><span class="small">What did I learn about myself or the world?</span><span class="small">What do I want to carry into tomorrow?</span></div></div>
+        </div>
+        <div class="separator">Your archive</div>
+        <div class="card"><label class="field"><span>Search entries</span><input id="diarySearch" type="search" placeholder="Search the text of your saved entries"></label><div id="diaryArchive" class="grid" aria-live="polite"></div><p class="small" id="diaryCount">No entries saved yet.</p></div>
+      </section>
+
+      <section class="page" id="page-goals" data-scope="goals">
+        <header class="page-header"><div><div class="kicker">Direction without a deadline for your life</div><h2>Goals &amp; roadmap</h2><p>Choose goals that matter to you. Translate a long-range direction into a small next step you can actually take.</p></div><div class="folio">01 / IMAGINE</div></header>
+        <div class="grid cols-2">
+          <div class="card dark"><h3>Your north star</h3><p>What would a fulfilling and sustainable life look like to you? Think about learning, work, relationships, contribution and rest.</p><div class="field"><span style="color:#c6d0cc">A future I want to move toward</span><textarea data-key="vision" placeholder="Use your own words. Plans can evolve."></textarea></div></div>
+          <div class="card"><h3>Keep your goals grounded</h3><label class="field"><span>What matters most right now?</span><textarea data-key="values" placeholder="A few priorities or values"></textarea></label><label class="field"><span>What do you want to make room for?</span><input data-key="make-room" placeholder="People, energy, creativity, rest…"></label><label class="field"><span>What can wait?</span><input data-key="later" placeholder="You do not have to do everything now"></label></div>
+        </div>
+        <div class="separator">A few goals at a time</div>
+        <div class="goal-grid" id="goalGrid"></div>
+        <div class="row no-print" style="margin-top:10px"><button class="button" id="addGoalButton">+ Add a goal</button></div>
+        <div class="separator">A flexible long-range map</div>
+        <div class="card">
+          <div class="row no-print" style="margin-bottom:10px"><label class="field" style="margin:0;min-width:190px"><span>Planning horizon</span><select id="horizonSelect"><option value="1">1 year</option><option value="2">2 years</option><option value="3">3 years</option><option value="4">4 years</option><option value="5">5 years</option><option value="6">6 years</option><option value="7">7 years</option><option value="8">8 years</option><option value="9">9 years</option><option value="10">10 years</option></select></label><span class="small">An optional horizon—not a promise or a countdown.</span></div>
+          <div class="table-wrap"><table class="table"><thead><tr><th>Period</th><th>Theme / milestone</th><th>Small evidence of progress</th><th>Review</th></tr></thead><tbody id="roadmapRows"></tbody></table></div>
+        </div>
+        <div class="callout">Keep the horizon useful, not intimidating. Adjust it when your circumstances or priorities change.</div>
+      </section>
+
+      <section class="page" id="page-day" data-scope="day">
+        <header class="page-header"><div><div class="kicker">A daily template with breathing room</div><h2>Daily plan</h2><p>Pick a few priorities, plan around real commitments and leave space to eat, move, recover and enjoy your day.</p></div><div class="folio">02 / TODAY</div></header>
+        <div class="card no-print">
+          <div class="row"><button class="button" id="dayPrevious">← Previous day</button><label class="field" style="margin:0"><span>Date</span><input class="date-input" id="dayDate" type="date"></label><button class="button" id="dayNext">Next day →</button><button class="button" id="dayTemplate">Use my usual hours</button><button class="button" id="dayClearTemplate">Clear time blocks</button></div>
+        </div>
+        <div id="dayContent" style="margin-top:13px"></div>
+      </section>
+
+      <section class="page" id="page-pomodoro" data-scope="pomodoro">
+        <header class="page-header"><div><div class="kicker">Focus with room to be human</div><h2>Study &amp; focus</h2><p>Choose one manageable stretch, pause when you need to, and take a short break. A timer can support attention; it never measures your worth.</p></div><div class="folio">03 / BEGIN</div></header>
+        <div class="grid cols-2">
+          <div class="card dark">
+            <h3 id="pomodoroPhase">One step at a time</h3>
+            <div class="timer-display" id="timerDisplay" role="timer" aria-live="off" aria-label="25 minutes remaining">25:00</div>
+            <p class="timer-status" id="timerStatus" role="status" aria-live="polite">Ready when you are. You can pause or stop at any time.</p>
+            <div class="row timer-controls">
+              <button class="button primary" id="startFocus" type="button">Start focus</button>
+              <button class="button" id="startBreak" type="button">Start 5-minute break</button>
+              <button class="button" id="pauseTimer" type="button" hidden>Pause</button>
+              <button class="button" id="resumeTimer" type="button" hidden>Resume</button>
+              <button class="button" id="endTimer" type="button" hidden>End session</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Set yourself up gently</h3>
+            <label class="field"><span>Focus duration</span><select id="focusDuration"><option value="15">15 minutes</option><option value="25" selected>25 minutes</option><option value="45">45 minutes</option><option value="50">50 minutes</option></select></label>
+            <label class="field"><span>What will you focus on? · optional</span><input id="focusTask" maxlength="160" placeholder="A class, a chapter, a small responsibility"></label>
+            <p class="small">This focus-task text stays only in this page's memory. It is not saved or synced.</p>
+            <label class="field"><span>What is the smallest first move? · optional</span><input id="focusStep" maxlength="160" placeholder="Open the notes, read one page, write one sentence"></label>
+            <label class="field"><span>How are you arriving? · optional</span><select id="focusCheckin"><option value="">Skip check-in</option><option value="ready">Ready</option><option value="distracted">A little distracted</option><option value="low-energy">Low energy</option><option value="unsure">Not sure yet</option></select></label>
+            <p class="small">No answer is wrong. You can begin even if you do not feel ready.</p>
+          </div>
+        </div>
+        <div class="card" id="postSessionReflection" style="margin-top:13px" hidden>
+          <h3>A gentle check-in · optional</h3>
+          <p class="small">Choose a non-personal note about the experience, or skip it. The choice is saved with the focus history; no task text or free-form reflection is collected.</p>
+          <label class="field"><span>What best describes this block?</span><select id="focusReflection"><option value="">Choose one or skip</option><option value="clear-step">The first step felt clear</option><option value="interrupted">I was interrupted</option><option value="plan-changed">I needed a different plan</option><option value="kept-going">I stayed with it</option><option value="needed-rest">I needed more rest</option></select></label>
+          <div class="row"><button class="button primary" id="saveFocusReflection" type="button">Save check-in</button><button class="button" id="skipFocusReflection" type="button">Skip</button></div>
+        </div>
+        <div class="callout teal">Daymark runs in your browser and cannot block other apps or websites. It does not request device-control permissions. If blocking helps, use built-in focus settings on your device separately.</div>
+        <div class="separator">Your focus history</div>
+        <div class="card"><div class="small">Saved on this device; included in account sync when enabled. Task names are never included.</div><div class="focus-history" id="focusHistory" aria-live="polite"></div></div>
+        <div class="callout">After a focus block, take a kind check-in: What helped? What got in the way? What is one small next step? Stopping early is useful information, not a failure.</div>
+      </section>
+
+      <section class="page" id="page-week" data-scope="week">
+        <header class="page-header"><div><div class="kicker">Plan the week you have</div><h2>Your week</h2><p>Choose a few outcomes. Commitments, rest and unexpected events all have a place.</p></div><div class="folio">03 / RHYTHM</div></header>
+        <div class="card no-print"><div class="row"><button class="button" id="weekPrevious">← Previous</button><strong id="weekLabel" style="color:var(--navy);font:500 15px Georgia"></strong><button class="button" id="weekNext">Next →</button></div></div>
+        <div class="grid cols-3" style="margin-top:13px">
+          <div class="card"><h3>Three useful outcomes</h3><label class="field"><span>One important thing</span><input data-key="outcome-1"></label><label class="field"><span>Another thing that matters</span><input data-key="outcome-2"></label><label class="field"><span>If there is room</span><input data-key="outcome-3"></label></div>
+          <div class="card tinted"><h3>Make room for</h3><div class="checklist"><label class="check"><input type="checkbox" data-key="sleep"><span>Sleep and a wind-down that works for me</span></label><label class="check"><input type="checkbox" data-key="movement"><span>Movement, fresh air or recovery</span></label><label class="check"><input type="checkbox" data-key="meals"><span>Regular meals and a little preparation</span></label><label class="check"><input type="checkbox" data-key="buffer"><span>Unscheduled time and flexibility</span></label></div><div class="progress"><span></span></div><div class="small progress-label">0 of 4</div></div>
+          <div class="card"><h3>End-of-week check-in</h3><label class="field"><span>What went well?</span><textarea data-key="win"></textarea></label><label class="field"><span>What needs to change?</span><textarea data-key="adjust"></textarea></label><label class="field"><span>One next step</span><input data-key="next"></label></div>
+        </div>
+        <div class="separator">Open a day</div><div class="card"><div class="week-grid" id="weekTiles"></div></div>
+        <div class="separator">Focus blocks</div><div class="card table-wrap"><table class="table"><thead><tr><th>Focus</th><th>Area</th><th>Small finish line</th><th>When</th><th>Done</th></tr></thead><tbody id="focusRows"></tbody></table></div>
+      </section>
+
+      <section class="page" id="page-month" data-scope="month">
+        <header class="page-header"><div><div class="kicker">See the month, not just the deadline</div><h2>Monthly view</h2><p>Use your calendar to see commitments and open space together. Plan for the ordinary days, not only the best-case ones.</p></div><div class="folio">04 / OVERVIEW</div></header>
+        <div class="card no-print"><div class="row"><button class="button" id="monthPrevious">← Previous</button><strong id="monthLabel" style="color:var(--navy);font:500 15px Georgia"></strong><button class="button" id="monthNext">Next →</button><button class="button" id="monthToday">Today</button></div></div>
+        <div class="grid cols-2" style="margin-top:13px">
+          <div class="card"><h3>Calendar · select a date to plan</h3><div class="calendar" id="calendar"></div></div>
+          <div class="card"><h3>Monthly intentions</h3><label class="field"><span>One area to focus on</span><textarea data-key="focus"></textarea></label><label class="field"><span>Important dates / commitments</span><textarea data-key="dates" placeholder="Appointments, deadlines, trips, celebrations…"></textarea></label><label class="field"><span>What do you want more room for?</span><input data-key="room"></label></div>
+        </div>
+        <div class="separator">A simple monthly reset</div><div class="grid cols-3"><div class="card"><h3>Keep</h3><label class="field"><span>What helped this month?</span><textarea data-key="keep"></textarea></label></div><div class="card"><h3>Change</h3><label class="field"><span>What felt harder than it needed to?</span><textarea data-key="change"></textarea></label></div><div class="card"><h3>Try</h3><label class="field"><span>One gentle experiment</span><textarea data-key="try"></textarea></label></div></div>
+      </section>
+
+      <section class="page" id="page-projects" data-scope="projects">
+        <header class="page-header"><div><div class="kicker">Personal, creative, academic or professional</div><h2>Projects &amp; tasks</h2><p>Turn projects into clear next actions. Track ideas, responsibilities, learning and the many different kinds of work that make up a life.</p></div><div class="folio">05 / MAKE</div></header>
+        <div class="grid cols-3"><div class="card"><h3>Project snapshot</h3><label class="field"><span>Project name</span><input data-key="project-name" placeholder="Name this project"></label><label class="field"><span>Why does it matter?</span><textarea data-key="project-why"></textarea></label><label class="field"><span>What does finished look like?</span><textarea data-key="project-done"></textarea></label></div><div class="card tinted"><h3>Next small step</h3><label class="field"><span>Action</span><input data-key="project-next"></label><label class="field"><span>When will you revisit it?</span><input data-key="project-review" type="date"></label><label class="field"><span>What might get in the way?</span><textarea data-key="project-obstacle"></textarea></label></div><div class="card"><h3>Project notes</h3><label class="field"><span>Ideas, decisions or things to ask</span><textarea data-key="project-notes" style="min-height:145px"></textarea></label></div></div>
+        <div class="separator">Flexible task list</div><div class="card table-wrap"><table class="table"><thead><tr><th>Task / responsibility</th><th>Area</th><th>Next action</th><th>Due / review</th><th>Done</th></tr></thead><tbody id="taskRows"></tbody></table><div class="row no-print" style="margin-top:10px"><button class="button" id="addTask">+ Add task</button><button class="button" id="removeTask">− Remove last</button></div></div>
+        <div class="separator">Project journal</div><div class="card table-wrap"><table class="table"><thead><tr><th>Date</th><th>What I tried</th><th>What happened</th><th>What I learned</th><th>Next step</th></tr></thead><tbody id="journalRows"></tbody></table></div>
+      </section>
+
+      <section class="page" id="page-wellbeing" data-scope="wellbeing">
+        <header class="page-header"><div><div class="kicker">Care is part of your plan</div><h2>Wellbeing &amp; routines</h2><p>Use this space to notice what helps you feel supported. Keep routines flexible and seek qualified care for health questions.</p></div><div class="folio">06 / RESTORE</div></header>
+        <div class="grid cols-3"><div class="card dark"><h3>A gentle baseline</h3><p>Consistent sleep, regular meals, movement you enjoy, connection and time away from screens can support everyday wellbeing.</p><div class="small">Start with what feels accessible. Your needs and capacity can change.</div></div><div class="card"><h3>Movement that fits</h3><label class="field"><span>Activities I enjoy or want to try</span><textarea data-key="activities" placeholder="Walking, stretching, sport, dance, strength, gardening…"></textarea></label><label class="field"><span>What makes it easier to begin?</span><input data-key="movement-cue"></label></div><div class="card tinted"><h3>Rest &amp; energy</h3><label class="field"><span>What helps me recharge?</span><textarea data-key="rest"></textarea></label><label class="field"><span>One boundary I want to protect</span><input data-key="boundary"></label></div></div>
+        <div class="separator">Plan supportive routines—not perfect days</div>
+        <div class="grid cols-3"><div class="card"><h3>Start of day</h3><label class="field"><span>A simple morning cue</span><textarea data-key="morning"></textarea></label></div><div class="card"><h3>Food &amp; nourishment</h3><label class="field"><span>Easy meals, snacks or prep ideas</span><textarea data-key="food" placeholder="Adapt to your culture, budget, preferences and needs."></textarea></label></div><div class="card"><h3>End of day</h3><label class="field"><span>One way to wind down</span><textarea data-key="evening"></textarea></label></div></div>
+        <div class="separator">Optional personal-care checklist</div><div class="card"><div class="checklist"><label class="check"><input type="checkbox" data-key="care-water"><span>Keep water accessible.</span></label><label class="check"><input type="checkbox" data-key="care-break"><span>Take a short screen or movement break.</span></label><label class="check"><input type="checkbox" data-key="care-outside"><span>Get outside or seek a little daylight if practical.</span></label><label class="check"><input type="checkbox" data-key="care-connect"><span>Reach out to someone supportive.</span></label></div></div>
+        <div class="callout">This planner is not medical advice. For health, diet, fitness, mental-health or accessibility needs, follow guidance from a qualified professional who understands your situation.</div>
+      </section>
+
+      <section class="page" id="page-review" data-scope="review">
+        <header class="page-header"><div><div class="kicker">Notice what is working. Begin again without guilt.</div><h2>Review &amp; habits</h2><p>A small habit can be worth repeating even when it is not done every day. Track experiments, not your value as a person.</p></div><div class="folio">07 / REFLECT</div></header>
+        <div class="grid cols-2">
+          <div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">A few things to practice</h3><label class="field" style="margin:0"><span>Month</span><input type="month" id="habitMonth" data-key="month"></label></div>
+            <label class="field"><span>Practice 1</span><input data-key="habit-1" placeholder="Make it small and kind"></label><label class="field"><span>Practice 2</span><input data-key="habit-2"></label><label class="field"><span>Practice 3</span><input data-key="habit-3"></label>
+            <p class="small">Choose a cue that makes the habit easier, and a minimum version for busy days.</p><label class="field"><span>My cue / minimum version</span><textarea data-key="habit-cue"></textarea></label>
+          </div>
+          <div class="card tinted"><h3>Monthly reflection</h3><label class="field"><span>Three things I appreciate about this month</span><textarea data-key="wins"></textarea></label><label class="field"><span>Something I learned</span><textarea data-key="lesson"></textarea></label><label class="field"><span>Where would a little more support help?</span><textarea data-key="support"></textarea></label><label class="field"><span>One intention for next month</span><input data-key="intention"></label></div>
+        </div>
+        <div class="separator">Mark the days you practiced</div><div class="card"><div id="habitGrid" class="calendar"></div></div>
+      </section>
+
+      <section class="page" id="page-settings" data-scope="settings">
+        <header class="page-header"><div><div class="kicker">Make this space feel like yours</div><h2>Preferences</h2><p>All of these settings are optional. Change the planner to match your schedule and responsibilities—not the other way around.</p></div><div class="folio">09 / PERSONALIZE</div></header>
+        <div class="grid cols-2">
+          <div class="card"><h3>A little context (optional)</h3><label class="field"><span>Name or greeting</span><input data-key="name" placeholder="Leave blank if you prefer"></label><label class="field"><span>What kind of season are you in?</span><input data-key="season" placeholder="Learning, caregiving, work, transition…"></label><label class="field"><span>Time zone / date format note</span><input data-key="locale-note" placeholder="Optional reminder"></label></div>
+          <div class="card tinted"><h3>Usual day</h3><p class="small">The daily template fills only the hours you choose. Edit every time block freely.</p><div class="grid cols-2"><label class="field"><span>Start time</span><input type="time" data-key="start" value="08:00"></label><label class="field"><span>Finish time</span><input type="time" data-key="finish" value="17:00"></label></div><label class="field"><span>Usual commitments or fixed hours</span><input data-key="commitment" placeholder="e.g., class, work, commute, care"></label></div>
+        </div>
+        <div class="separator">Your data &amp; this app</div>
+        <div class="card" id="syncCard">
+          <h3>Optional account sync</h3>
+          <p class="small">Local-only mode remains available. When you sign in and sync, all saved planner and diary content—including personal notes—is sent over HTTPS to the Supabase backend configured by the site owner and stored under your account. Focus-task text from the Focus page is not saved or sent. Use <strong>Turn off sync</strong> or <strong>Sign out</strong> to stop future uploads; signing out withdraws stored consent but preserves local records. A request already sent may finish. Account sync is not end-to-end encrypted.</p>
+          <p class="small" id="syncStatus" role="status" aria-live="polite">Account sync is not configured for this copy of Daymark.</p>
+          <div class="grid cols-2" id="syncAuthForm">
+            <label class="field"><span>Email</span><input id="syncEmail" type="email" autocomplete="email"></label>
+            <label class="field"><span>Password</span><input id="syncPassword" type="password" autocomplete="current-password"></label>
+          </div>
+          <label class="consent-row"><input id="syncConsent" type="checkbox"><span>I understand that, after sign-in, syncing uploads all saved planner and diary content to the configured backend for my account.</span></label>
+          <div class="row no-print">
+            <button class="button primary" id="syncSignIn" type="button">Sign in</button>
+            <button class="button" id="syncSignUp" type="button">Create account</button>
+            <button class="button" id="syncNow" type="button" hidden>Sync now</button>
+            <button class="button primary" id="syncEnable" type="button" hidden>Enable account sync</button>
+            <button class="button" id="syncDisable" type="button" hidden>Turn off sync</button>
+            <button class="button" id="syncSignOut" type="button" hidden>Sign out</button>
+          </div>
+          <div id="syncConflicts" aria-live="polite"></div>
+        </div>
+        <div class="grid cols-2" style="margin-top:13px"><div class="card"><h3>Local data &amp; backups</h3><p class="small">Planner records are saved in this browser's IndexedDB database. Anyone with access to this browser profile may be able to access them; browser storage is not encrypted by Daymark.</p><p class="small">The browser may grant persistent storage, but cannot guarantee years of data if site data is cleared, a device is lost, or storage is removed. Export regular backups and keep copies somewhere private.</p></div><div class="card"><h3>Open, free and easy to share</h3><p class="small">Daymark stays a static website with no ads, trackers, or device-control permissions. You can host it with GitHub Pages or install it as an app when served over HTTPS.</p><p class="small">Printing uses your browser's print dialog. Choose A4 paper and “Save as PDF” for a digital copy.</p></div></div>
+        <div class="callout teal">Need a fresh start? Export a backup first, then clear this site's saved data in your browser settings. This app does not silently erase your work.</div>
+      </section>
+
+      <footer class="footer">Daymark · A free, adaptable planner for study, focus and everyday life. <a href="README.md" style="color:inherit">About this project</a></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="loading-cover" id="loadingCover" role="status">Opening your private diary…</div>
+  <script src="./config.js"></script>
+  <script src="./daymark-core.js"></script>
+  <script>
+    (async () => {
+      "use strict";
+      const STORAGE_KEY = "daymark-planner-v1";
+      const DATABASE_NAME = "daymark-private-planner";
+      const DATABASE_VERSION = 3;
+      const syncConfiguration = window.DAYMARK_CONFIG || {};
+      const syncUrl = typeof syncConfiguration.supabaseUrl === "string" ? syncConfiguration.supabaseUrl.replace(/\/+$/, "") : "";
+      const syncKey = typeof syncConfiguration.supabaseAnonKey === "string" ? syncConfiguration.supabaseAnonKey.trim() : "";
+      const syncConfigured = /^https:\/\/[^/]+$/i.test(syncUrl) && Boolean(syncKey);
+      const core = window.DaymarkCore;
+      const byId = id => document.getElementById(id);
+      const all = (selector, root = document) => [...root.querySelectorAll(selector)];
+      const localDate = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      const dateLabel = (date, options = { weekday: "long", month: "long", day: "numeric", year: "numeric" }) => date.toLocaleDateString(undefined, options);
+      const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+      const parseStored = () => {
+        try {
+          const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+          return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+        } catch { return {}; }
+      };
+      let data = parseStored();
+      document.querySelector(".app").inert = true;
+      let database = null;
+      let storageMode = "opening";
+      let writeQueue = Promise.resolve();
+      let writeRevision = 0;
+      let lastPersistedData = {};
+      let saveTimer = 0;
+      const pendingKeys = new Set();
+      let authSession = null;
+      let syncInProgress = false;
+      let syncAgain = false;
+      let syncTimer = 0;
+      let syncAbortController = null;
+      let applyingRemote = false;
+      let pendingConflicts = null;
+      let pomodoroSession = null;
+      let pomodoroTick = 0;
+      let awaitingReflection = false;
+      let lastFocusRecordKey = "";
+      const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+      let theme = data._theme || (prefersDark ? "dark" : "light");
+      let selectedDate = new Date();
+      selectedDate.setHours(12, 0, 0, 0);
+      let shownMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+      let goalCount = Math.max(3, Math.min(20, Number(data._goalCount) || 3));
+      let taskCount = Math.max(6, Math.min(40, Number(data._taskCount) || 6));
+      const getPageScope = el => el.closest(".page")?.dataset.scope || "home";
+      const storageId = el => `${getPageScope(el)}:${el.dataset.key}`;
+      let toastTimer;
+      const showToast = message => {
+        const toast = byId("toast");
+        toast.textContent = message;
+        toast.classList.add("visible");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("visible"), 1900);
+      };
+
+      function setStorageStatus(label, state = "saved", detail = "") {
+        byId("storageLabel").textContent = label;
+        byId("storageStatus").className = `storage-status${state === "warning" ? " warning" : state === "error" ? " error" : ""}`;
+        byId("storageStatus").title = detail || label;
+      }
+
+      function openDatabase() {
+        return new Promise((resolve, reject) => {
+          if (!("indexedDB" in window)) { reject(new Error("IndexedDB is unavailable")); return; }
+          const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
+          request.onupgradeneeded = () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains("planner")) db.createObjectStore("planner", { keyPath: "id" });
+            if (!db.objectStoreNames.contains("entries")) db.createObjectStore("entries", { keyPath: "key" });
+            if (!db.objectStoreNames.contains("syncMeta")) db.createObjectStore("syncMeta", { keyPath: "key" });
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error || new Error("Could not open private storage"));
+          request.onblocked = () => reject(new Error("Private storage is blocked by another open Daymark tab"));
+        });
+      }
+
+      function readDatabase(db) {
+        return new Promise((resolve, reject) => {
+          const transaction = db.transaction(["planner", "entries"], "readonly");
+          const entriesRequest = transaction.objectStore("entries").getAll();
+          const legacyRequest = transaction.objectStore("planner").get("main");
+          entriesRequest.onerror = () => reject(entriesRequest.error || new Error("Could not read diary entries"));
+          legacyRequest.onerror = () => reject(legacyRequest.error || new Error("Could not read older planner data"));
+          transaction.oncomplete = () => {
+            try {
+              const entries = entriesRequest.result;
+              if (entries.length) resolve(Object.fromEntries(entries.map(entry => [entry.key, entry.value])));
+              else if (typeof legacyRequest.result?.data === "string") resolve(JSON.parse(legacyRequest.result.data));
+              else resolve({});
+            } catch (error) {
+              reject(error);
+            }
+          };
+          transaction.onabort = () => reject(transaction.error || new Error("Diary read was interrupted"));
+        });
+      }
+
+      function writeDatabase(changes) {
+        return new Promise((resolve, reject) => {
+          const transaction = database.transaction("entries", "readwrite");
+          const store = transaction.objectStore("entries");
+          changes.forEach(([key, value]) => {
+            if (value === undefined) store.delete(key);
+            else store.put({ key, value });
+          });
+          transaction.oncomplete = resolve;
+          transaction.onerror = () => reject(transaction.error || new Error("Could not save your diary"));
+          transaction.onabort = () => reject(transaction.error || new Error("Diary save was interrupted"));
+        });
+      }
+
+      function readSyncBase(userId) {
+        return new Promise((resolve, reject) => {
+          if (!database || !database.objectStoreNames.contains("syncMeta")) {
+            reject(new Error("Local sync metadata is unavailable; planner data remains on this device."));
+            return;
+          }
+          const transaction = database.transaction("syncMeta", "readonly");
+          const request = transaction.objectStore("syncMeta").get(`base:${userId}`);
+          request.onsuccess = () => resolve(request.result?.records || {});
+          request.onerror = () => reject(request.error || new Error("Could not read the local sync baseline"));
+        });
+      }
+
+      function writeSyncBase(userId, records) {
+        return new Promise((resolve, reject) => {
+          const transaction = database.transaction("syncMeta", "readwrite");
+          transaction.objectStore("syncMeta").put({ key: `base:${userId}`, records });
+          transaction.oncomplete = resolve;
+          transaction.onerror = () => reject(transaction.error || new Error("Could not save the local sync baseline"));
+          transaction.onabort = () => reject(transaction.error || new Error("Local sync baseline save was interrupted"));
+        });
+      }
+
+      async function initializeStorage() {
+        try {
+          database = await openDatabase();
+          const stored = await readDatabase(database);
+          if (!stored || typeof stored !== "object" || Array.isArray(stored)) throw new Error("Saved diary data is invalid");
+          const hasIndexedEntries = Object.keys(stored).length > 0;
+          if (hasIndexedEntries) {
+            data = stored;
+          } else {
+            const legacy = parseStored();
+            if (Object.keys(legacy).length) {
+              data = legacy;
+              await writeDatabase(Object.entries(data));
+              try { localStorage.removeItem(STORAGE_KEY); } catch { /* The IndexedDB copy is already safe. */ }
+            }
+          }
+          lastPersistedData = { ...data };
+          storageMode = "indexeddb";
+          setStorageStatus("Saved on this device", "saved", "Your diary is stored in this browser using IndexedDB. Export regular backups; browser data can still be cleared.");
+          if (navigator.storage?.persist) {
+            try {
+              const persistent = await navigator.storage.persist();
+              if (persistent) setStorageStatus("Device storage protected", "saved", "The browser granted persistent storage. Keep backups anyway.");
+            } catch { /* Persistence permission is optional; ordinary storage remains available. */ }
+          }
+        } catch (error) {
+          storageMode = "localstorage";
+          data = parseStored();
+          setStorageStatus("Browser storage limited", "warning", `IndexedDB could not be opened (${error.message}). Changes will use limited browser storage; export backups often.`);
+        }
+        theme = data._theme === "dark" || data._theme === "light"
+          ? data._theme
+          : (prefersDark ? "dark" : "light");
+        goalCount = Math.max(3, Math.min(20, Number(data._goalCount) || 3));
+        taskCount = Math.max(6, Math.min(40, Number(data._taskCount) || 6));
+      }
+
+      function persist(onlyKeys = null) {
+        if (storageMode === "indexeddb" && database) {
+          const changed = onlyKeys ? new Set(onlyKeys) : new Set([...Object.keys(data), ...Object.keys(lastPersistedData)]);
+          const changes = [...changed]
+            .filter(key => data[key] !== lastPersistedData[key])
+            .map(key => [key, data[key]]);
+          if (!changes.length) return writeQueue;
+          const revision = ++writeRevision;
+          setStorageStatus("Saving on this device…", "saved", "Writing your changes to the local diary database.");
+          writeQueue = writeQueue.then(() => writeDatabase(changes)).then(() => {
+            changes.forEach(([key, value]) => {
+              if (value === undefined) delete lastPersistedData[key];
+              else lastPersistedData[key] = value;
+            });
+            if (revision === writeRevision) setStorageStatus("Saved on this device", "saved", "Your diary is stored in this browser using IndexedDB. Export regular backups; browser data can still be cleared.");
+            if (authSession && !applyingRemote) scheduleRemoteSync();
+          }).catch(error => {
+            if (revision === writeRevision) {
+              setStorageStatus("Save needs attention", "error", `Could not save to IndexedDB: ${error.message}. Export a backup and keep this tab open while you troubleshoot.`);
+              showToast("A change may not have been saved. Export a backup.");
+            }
+          });
+          return writeQueue;
+        }
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          setStorageStatus("Saved · limited browser storage", "warning", "IndexedDB is unavailable. Browser storage may have a small quota; export regular backups.");
+        } catch (error) {
+          setStorageStatus("Save needs attention", "error", `Browser storage is full or unavailable: ${error.message}`);
+          showToast("Storage is full or unavailable. Export a backup now.");
+        }
+        return Promise.resolve();
+      }
+
+      function schedulePersist(key) {
+        pendingKeys.add(key);
+        clearTimeout(saveTimer);
+        setStorageStatus("Unsaved changes…", "warning", "Changes are in memory and will be saved shortly. Keep regular backups.");
+        saveTimer = setTimeout(() => {
+          saveTimer = 0;
+          const keys = [...pendingKeys];
+          pendingKeys.clear();
+          persist(keys);
+        }, 250);
+      }
+
+      function hydrate(root = document) {
+        all("[data-key]", root).forEach(el => {
+          const value = data[storageId(el)];
+          if (value === undefined) return;
+          if (el.type === "checkbox") el.checked = value === "true";
+          else el.value = value;
+        });
+      }
+
+      function refreshProgress(root = document) {
+        all(".progress", root).forEach(progress => {
+          const card = progress.closest(".card") || root;
+          const checks = all('input[type="checkbox"][data-key]', card);
+          const completed = checks.filter(check => check.checked).length;
+          const percent = checks.length ? Math.round(completed / checks.length * 100) : 0;
+          const fill = progress.querySelector("span");
+          if (fill) fill.style.width = `${percent}%`;
+          const label = card.querySelector(".progress-label");
+          if (label) label.textContent = `${completed} of ${checks.length} complete`;
+        });
+      }
+
+      function setPage(name) {
+        all(".page").forEach(page => page.classList.toggle("active", page.id === `page-${name}`));
+        all(".nav [data-page]").forEach(button => {
+          const active = button.dataset.page === name;
+          button.classList.toggle("active", active);
+          if (active) button.setAttribute("aria-current", "page");
+          else button.removeAttribute("aria-current");
+        });
+        if (name === "day") renderDay();
+        if (name === "week") renderWeek();
+        if (name === "month") renderMonth();
+        if (name === "goals") renderGoals();
+        if (name === "projects") renderProjectTables();
+        if (name === "review") renderHabitGrid();
+        if (name === "pomodoro") {
+          renderPomodoro();
+          renderFocusHistory();
+        }
+        if (name === "diary") {
+          byId("diaryDate").value = localDate(selectedDate);
+          byId("diaryText").value = data[`day:${localDate(selectedDate)}:diary-entry`] || "";
+          renderDiaryArchive();
+        }
+        hydrate(byId(`page-${name}`));
+        refreshProgress(byId(`page-${name}`));
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      document.addEventListener("click", event => {
+        const nav = event.target.closest("[data-page]");
+        if (nav) { setPage(nav.dataset.page); return; }
+        const link = event.target.closest("[data-go]");
+        if (link) { setPage(link.dataset.go); return; }
+        const openDate = event.target.closest("[data-open-date]");
+        if (openDate) {
+          selectedDate = new Date(`${openDate.dataset.openDate}T12:00:00`);
+          setPage("day");
+        }
+      });
+
+      document.addEventListener("input", event => {
+        if (!event.target.matches("[data-key]")) return;
+        const key = storageId(event.target);
+        data[key] = event.target.type === "checkbox" ? String(event.target.checked) : event.target.value;
+        if (event.target.type === "checkbox") persist([key]);
+        else schedulePersist(key);
+        refreshProgress(event.target.closest(".card") || document);
+        if (event.target.dataset.key === "name") updateGreeting();
+        if (event.target.dataset.key === "diary-entry" || event.target.id === "diarySearch") renderDiaryArchive();
+      });
+      document.addEventListener("change", event => {
+        if (!event.target.matches("[data-key]")) return;
+        const key = storageId(event.target);
+        data[key] = event.target.type === "checkbox" ? String(event.target.checked) : event.target.value;
+        clearTimeout(saveTimer);
+        saveTimer = 0;
+        pendingKeys.clear();
+        persist();
+        refreshProgress(event.target.closest(".card") || document);
+        if (event.target.dataset.key === "name") updateGreeting();
+        if (event.target.dataset.key === "diary-entry") renderDiaryArchive();
+      });
+
+      function updateGreeting() {
+        const name = data["settings:name"]?.trim();
+        byId("greeting").textContent = name ? `A little space for your next steps, ${name}.` : "Your goals, time and energy — in one place.";
+      }
+
+      function readPomodoroSession() {
+        try {
+          const stored = JSON.parse(sessionStorage.getItem("daymark-pomodoro-session") || "null");
+          if (!stored || !["focus", "break"].includes(stored.kind) || !Number.isFinite(stored.durationMs)) return null;
+          return stored;
+        } catch {
+          return null;
+        }
+      }
+
+      function savePomodoroSession() {
+        try {
+          if (pomodoroSession) sessionStorage.setItem("daymark-pomodoro-session", JSON.stringify(pomodoroSession));
+          else sessionStorage.removeItem("daymark-pomodoro-session");
+        } catch {
+          byId("timerStatus").textContent = "The timer still works, but this tab could not save its temporary timer state.";
+        }
+      }
+
+      function renderFocusHistory() {
+        const reflectionLabels = {
+          "clear-step": "first step felt clear",
+          interrupted: "was interrupted",
+          "plan-changed": "needed a different plan",
+          "kept-going": "stayed with it",
+          "needed-rest": "needed more rest"
+        };
+        const history = Object.entries(data)
+          .filter(([key, value]) => key.startsWith("focus-session:") && value && typeof value === "object")
+          .map(([, value]) => value)
+          .sort((left, right) => String(right.startedAt).localeCompare(String(left.startedAt)));
+        byId("focusHistory").innerHTML = history.slice(0, 20).map(entry => {
+          const date = new Date(entry.startedAt);
+          const elapsed = Math.max(0, Math.round(Number(entry.elapsedSeconds) || 0));
+          const minutes = Math.floor(elapsed / 60);
+          const seconds = elapsed % 60;
+          const outcome = entry.outcome === "completed" ? "Completed" : "Ended early";
+          const reflection = reflectionLabels[entry.reflection];
+          return `<div class="focus-history-entry"><span>${escapeHtml(dateLabel(date, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))} · ${outcome}${reflection ? ` · ${escapeHtml(reflection)}` : ""}</span><span>${minutes}m${seconds ? ` ${seconds}s` : ""} / ${Number(entry.plannedMinutes) || 0}m</span></div>`;
+        }).join("") || '<p class="small">Your first focus block can be small. History appears here after you finish or end a focus session.</p>';
+      }
+
+      function renderPomodoro() {
+        const active = Boolean(pomodoroSession);
+        const paused = active && pomodoroSession.paused;
+        const remaining = active
+          ? core.timerRemaining(pomodoroSession)
+          : Number(byId("focusDuration").value || 25) * 60_000;
+        const seconds = Math.ceil(remaining / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const remainder = seconds % 60;
+        byId("timerDisplay").textContent = `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+        byId("timerDisplay").setAttribute("aria-label", `${minutes} minutes ${remainder} seconds remaining`);
+        byId("pomodoroPhase").textContent = active
+          ? pomodoroSession.kind === "focus" ? "Focus block" : "Short break"
+          : "One step at a time";
+        byId("startFocus").hidden = active || awaitingReflection;
+        byId("startBreak").hidden = active;
+        byId("pauseTimer").hidden = !active || paused;
+        byId("resumeTimer").hidden = !active || !paused;
+        byId("endTimer").hidden = !active;
+        byId("focusDuration").disabled = active;
+        byId("focusTask").disabled = active;
+        byId("focusStep").disabled = active;
+        byId("focusCheckin").disabled = active;
+      }
+
+      function startPomodoro(kind) {
+        if (pomodoroSession || awaitingReflection) return;
+        const durationMs = (kind === "break" ? 5 : Number(byId("focusDuration").value)) * 60_000;
+        const startedAt = Date.now();
+        pomodoroSession = {
+          kind,
+          durationMs,
+          remainingMs: durationMs,
+          startedAt,
+          endsAt: startedAt + durationMs,
+          paused: false,
+          checkIn: kind === "focus" ? byId("focusCheckin").value : ""
+        };
+        savePomodoroSession();
+        byId("timerStatus").textContent = kind === "focus"
+          ? "Your focus block has started. Pause or end it whenever you need."
+          : "Take this break in whatever way feels restorative.";
+        renderPomodoro();
+        clearInterval(pomodoroTick);
+        pomodoroTick = setInterval(updatePomodoro, 1000);
+      }
+
+      function finishPomodoro(completed) {
+        if (!pomodoroSession) return;
+        const finishedSession = pomodoroSession;
+        if (finishedSession.kind === "focus") {
+          const elapsedSeconds = Math.floor(core.timerElapsed(finishedSession) / 1000);
+          if (elapsedSeconds > 0) {
+            const id = crypto.randomUUID();
+            const record = {
+              startedAt: new Date(finishedSession.startedAt).toISOString(),
+              completedAt: new Date().toISOString(),
+              plannedMinutes: Math.round(finishedSession.durationMs / 60_000),
+              elapsedSeconds,
+              outcome: completed ? "completed" : "ended",
+              checkIn: finishedSession.checkIn || "",
+              reflection: ""
+            };
+            const key = `focus-session:${id}`;
+            data[key] = record;
+            lastFocusRecordKey = key;
+            awaitingReflection = true;
+            byId("postSessionReflection").hidden = false;
+            byId("focusReflection").value = "";
+            persist([key]);
+          }
+          byId("focusTask").value = "";
+          byId("focusStep").value = "";
+          byId("focusCheckin").value = "";
+          byId("timerStatus").textContent = completed
+            ? "Focus block complete. Take a short break after the optional check-in, or skip it and stop here."
+            : "Session ended. Save an optional check-in or skip it; beginning again is always your choice.";
+        } else {
+          byId("timerStatus").textContent = completed
+            ? "Break complete. Continue at your own pace, or take more rest if you need it."
+            : "Break ended. Your next step is yours to choose.";
+        }
+        pomodoroSession = null;
+        clearInterval(pomodoroTick);
+        savePomodoroSession();
+        renderPomodoro();
+        renderFocusHistory();
+      }
+
+      function updatePomodoro() {
+        if (!pomodoroSession) return;
+        if (core.timerRemaining(pomodoroSession) <= 0) {
+          finishPomodoro(true);
+          return;
+        }
+        renderPomodoro();
+      }
+
+      byId("focusDuration").value = ["15", "25", "45", "50"].includes(String(data["pomodoro:duration"]))
+        ? String(data["pomodoro:duration"])
+        : "25";
+      byId("focusDuration").addEventListener("change", event => {
+        data["pomodoro:duration"] = event.target.value;
+        persist(["pomodoro:duration"]);
+        renderPomodoro();
+      });
+      byId("startFocus").addEventListener("click", () => startPomodoro("focus"));
+      byId("startBreak").addEventListener("click", () => startPomodoro("break"));
+      byId("pauseTimer").addEventListener("click", () => {
+        if (!pomodoroSession || pomodoroSession.paused) return;
+        pomodoroSession.remainingMs = core.timerRemaining(pomodoroSession);
+        pomodoroSession.paused = true;
+        savePomodoroSession();
+        clearInterval(pomodoroTick);
+        byId("timerStatus").textContent = "Paused. You can resume or end this session.";
+        renderPomodoro();
+      });
+      byId("resumeTimer").addEventListener("click", () => {
+        if (!pomodoroSession || !pomodoroSession.paused) return;
+        pomodoroSession.paused = false;
+        pomodoroSession.endsAt = Date.now() + pomodoroSession.remainingMs;
+        savePomodoroSession();
+        byId("timerStatus").textContent = "Resumed. Pause or end it whenever you need.";
+        renderPomodoro();
+        pomodoroTick = setInterval(updatePomodoro, 1000);
+      });
+      byId("endTimer").addEventListener("click", () => finishPomodoro(false));
+      byId("saveFocusReflection").addEventListener("click", () => {
+        if (!awaitingReflection || !lastFocusRecordKey) return;
+        const reflection = byId("focusReflection").value;
+        if (!reflection) {
+          byId("timerStatus").textContent = "Choose a check-in, or use Skip.";
+          return;
+        }
+        data[lastFocusRecordKey] = { ...data[lastFocusRecordKey], reflection };
+        persist([lastFocusRecordKey]);
+        awaitingReflection = false;
+        lastFocusRecordKey = "";
+        byId("postSessionReflection").hidden = true;
+        byId("timerStatus").textContent = "Check-in saved. Take a break or continue at your own pace.";
+        renderPomodoro();
+        renderFocusHistory();
+      });
+      byId("skipFocusReflection").addEventListener("click", () => {
+        awaitingReflection = false;
+        lastFocusRecordKey = "";
+        byId("postSessionReflection").hidden = true;
+        byId("timerStatus").textContent = "Check-in skipped. Your focus history is saved; take a break or continue at your own pace.";
+        renderPomodoro();
+      });
+      document.addEventListener("visibilitychange", updatePomodoro);
+
+      function syncStatus(message, isError = false) {
+        byId("syncStatus").textContent = message;
+        byId("syncStatus").className = isError ? "small error" : "small";
+      }
+
+      function loadAuthSession() {
+        try {
+          const stored = JSON.parse(localStorage.getItem("daymark-auth-session-v1") || "null");
+          return stored && typeof stored.access_token === "string" && typeof stored.user?.id === "string" ? stored : null;
+        } catch {
+          return null;
+        }
+      }
+
+      function storeAuthSession(session) {
+        authSession = session;
+        if (session) localStorage.setItem("daymark-auth-session-v1", JSON.stringify(session));
+        else localStorage.removeItem("daymark-auth-session-v1");
+        renderSyncPanel();
+      }
+
+      function hasSyncConsent() {
+        try {
+          return localStorage.getItem("daymark-sync-consent-v1") === "yes";
+        } catch {
+          return false;
+        }
+      }
+
+      function currentSyncOwner() {
+        try {
+          return localStorage.getItem("daymark-sync-owner-v1");
+        } catch {
+          return null;
+        }
+      }
+
+      function bindSyncOwner(userId) {
+        const ownerStatus = core.syncOwnerStatus(currentSyncOwner(), userId);
+        if (ownerStatus === "blocked") {
+          throw new Error("This browser's local planner is already linked to a different account. To prevent sharing another person's records, account switching is blocked here. Use a separate browser profile or device for another account; Daymark will not move or clear your data.");
+        }
+        if (ownerStatus === "unbound") {
+          try {
+            localStorage.setItem("daymark-sync-owner-v1", userId);
+          } catch {
+            throw new Error("Daymark could not save this browser's account owner safely. Sync is paused and your planner remains local.");
+          }
+        }
+      }
+
+      function saveSyncConsent() {
+        if (!byId("syncConsent").checked) return false;
+        try {
+          localStorage.setItem("daymark-sync-consent-v1", "yes");
+          return true;
+        } catch {
+          return false;
+        }
+      }
+
+      function renderSyncPanel() {
+        const signedIn = Boolean(authSession);
+        const consented = hasSyncConsent();
+        const ownerStatus = signedIn ? core.syncOwnerStatus(currentSyncOwner(), authSession.user.id) : "signed-out";
+        byId("syncAuthForm").hidden = !syncConfigured || signedIn;
+        byId("syncConsent").closest(".consent-row").hidden = !syncConfigured || (signedIn && consented);
+        byId("syncSignIn").hidden = !syncConfigured || signedIn;
+        byId("syncSignUp").hidden = !syncConfigured || signedIn;
+        byId("syncNow").hidden = !syncConfigured || !signedIn || !consented || ownerStatus === "blocked";
+        byId("syncEnable").hidden = !syncConfigured || !signedIn || consented || ownerStatus === "blocked";
+        byId("syncDisable").hidden = !syncConfigured || !signedIn || !consented;
+        byId("syncSignOut").hidden = !signedIn;
+        byId("syncConsent").checked = consented;
+        if (!syncConfigured) {
+          syncStatus("Account sync is not configured for this copy of Daymark. Your planner remains local.", false);
+        } else if (ownerStatus === "blocked") {
+          syncStatus("This browser is linked to a different account. To protect its local planner data, syncing and account switching are blocked here. Use another browser profile or device for another account.", true);
+        } else if (signedIn && !consented) {
+          syncStatus(`Signed in as ${authSession.user.email || "your account"}. Sync is paused; confirm the data-sharing notice and enable it when you choose.`);
+        } else if (signedIn) {
+          byId("syncEmail").value = "";
+          byId("syncPassword").value = "";
+          syncStatus(`Signed in as ${authSession.user.email || "your account"}. Planner and diary records are saved locally and can sync to your account.`);
+        } else {
+          byId("syncConsent").checked = consented;
+          syncStatus("Not signed in. Your planner stays on this device unless you choose account sync.");
+        }
+      }
+
+      async function authRequest(path, body) {
+        const response = await fetch(`${syncUrl}/auth/v1/${path}`, {
+          method: "POST",
+          headers: { apikey: syncKey, "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.msg || payload.message || payload.error_description || `Account request failed (${response.status})`);
+        return payload;
+      }
+
+      async function refreshAuthSession() {
+        if (!authSession?.refresh_token) throw new Error("Your sign-in has expired. Sign in again to sync.");
+        const refreshed = await authRequest("token?grant_type=refresh_token", { refresh_token: authSession.refresh_token });
+        const nextSession = {
+          ...refreshed,
+          user: refreshed.user || authSession.user,
+          expires_at: refreshed.expires_at || Math.floor(Date.now() / 1000) + Number(refreshed.expires_in || 3600)
+        };
+        storeAuthSession(nextSession);
+        return nextSession;
+      }
+
+      async function getValidAuthSession() {
+        if (!authSession) throw new Error("Sign in before syncing.");
+        if (Number(authSession.expires_at || 0) <= Math.floor(Date.now() / 1000) + 60) return refreshAuthSession();
+        return authSession;
+      }
+
+      async function syncRequest(path, options = {}, retry = true) {
+        if (!hasSyncConsent()) throw new Error("Account sync is paused because consent was withdrawn.");
+        const session = await getValidAuthSession();
+        if (!hasSyncConsent() || syncAbortController?.signal.aborted) throw new Error("Account sync was paused before this request could start.");
+        const response = await fetch(`${syncUrl}/rest/v1/${path}`, {
+          ...options,
+          signal: syncAbortController?.signal,
+          headers: {
+            apikey: syncKey,
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+          }
+        });
+        if (response.status === 401 && retry && session.refresh_token) {
+          await refreshAuthSession();
+          return syncRequest(path, options, false);
+        }
+        const text = await response.text();
+        let payload = null;
+        try { payload = text ? JSON.parse(text) : null; } catch { payload = text; }
+        if (!response.ok) {
+          const message = payload?.message || payload?.details || payload?.hint || `Sync request failed (${response.status})`;
+          const error = new Error(message);
+          error.status = response.status;
+          throw error;
+        }
+        return payload;
+      }
+
+      async function fetchRemoteRecords() {
+        const url = new URL(`${syncUrl}/rest/v1/daymark_sync_records`);
+        url.searchParams.set("select", "key,value,deleted,revision");
+        url.searchParams.set("order", "key.asc");
+        const rows = await syncRequest(url.toString().replace(`${syncUrl}/rest/v1/`, ""));
+        if (!Array.isArray(rows) || rows.some(row => typeof row.key !== "string" || !Number.isInteger(Number(row.revision)))) {
+          throw new Error("The sync server returned records in an unexpected format.");
+        }
+        return rows.map(row => ({ ...row, revision: Number(row.revision) }));
+      }
+
+      class SyncRaceError extends Error {}
+
+      async function pushRemoteChanges(changes, remoteRecords) {
+        for (const change of changes) {
+          const current = remoteRecords[change.key];
+          const body = {
+            value: change.state.deleted ? null : change.state.value,
+            deleted: change.state.deleted
+          };
+          if (current) {
+            const url = new URL(`${syncUrl}/rest/v1/daymark_sync_records`);
+            url.searchParams.set("key", `eq.${change.key}`);
+            url.searchParams.set("revision", `eq.${current.revision}`);
+            const updated = await syncRequest(url.toString().replace(`${syncUrl}/rest/v1/`, ""), {
+              method: "PATCH",
+              headers: { Prefer: "return=representation" },
+              body: JSON.stringify(body)
+            });
+            if (!Array.isArray(updated) || updated.length !== 1) throw new SyncRaceError("Another device changed a record during sync.");
+          } else {
+            try {
+              await syncRequest("daymark_sync_records", {
+                method: "POST",
+                headers: { Prefer: "return=minimal" },
+                body: JSON.stringify({ key: change.key, ...body })
+              });
+            } catch (error) {
+              if (error.status === 409) throw new SyncRaceError("Another device added a record during sync.");
+              throw error;
+            }
+          }
+        }
+      }
+
+      function valueAt(dataObject, key) {
+        return Object.prototype.hasOwnProperty.call(dataObject, key)
+          ? { present: true, value: dataObject[key] }
+          : { present: false };
+      }
+
+      function setState(dataObject, key, state) {
+        if (!state || state.deleted) delete dataObject[key];
+        else dataObject[key] = state.value;
+      }
+
+      function renderSyncConflicts() {
+        const container = byId("syncConflicts");
+        if (!pendingConflicts?.conflicts.length) {
+          container.innerHTML = "";
+          return;
+        }
+        container.innerHTML = `<div class="callout">Some records changed on both this device and another device since the last sync. Neither version was replaced. Choose one version for each item to continue.</div>`
+          + pendingConflicts.conflicts.map((conflict, index) => {
+            const chosen = pendingConflicts.choices[index];
+            return `<div class="sync-conflict"><p><strong>${escapeHtml(conflict.key)}</strong></p><div class="row"><button class="button${chosen === "local" ? " primary" : ""}" type="button" data-conflict-index="${index}" data-conflict-choice="local">Keep this device</button><button class="button${chosen === "remote" ? " primary" : ""}" type="button" data-conflict-index="${index}" data-conflict-choice="remote">Use account copy</button></div></div>`;
+          }).join("");
+      }
+
+      async function applyResolvedConflicts() {
+        if (!pendingConflicts || pendingConflicts.choices.some(choice => !choice)) return;
+        const resolution = pendingConflicts;
+        const userId = authSession.user.id;
+        const nextBase = { ...resolution.baseRecords };
+        for (let index = 0; index < resolution.conflicts.length; index++) {
+          const conflict = resolution.conflicts[index];
+          const latestRemote = resolution.remoteRecords[conflict.key];
+          if (latestRemote) nextBase[conflict.key] = latestRemote;
+          else delete nextBase[conflict.key];
+          if (resolution.choices[index] !== "remote") continue;
+          const current = valueAt(data, conflict.key);
+          const observed = valueAt(resolution.snapshot, conflict.key);
+          if (!core.sameValue(current, observed)) continue;
+          setState(data, conflict.key, conflict.remote);
+        }
+        pendingConflicts = null;
+        renderSyncConflicts();
+        applyingRemote = true;
+        await persist();
+        applyingRemote = false;
+        if (Object.keys(data).some(key => !core.sameValue(valueAt(data, key), valueAt(lastPersistedData, key)))
+          || Object.keys(lastPersistedData).some(key => !core.sameValue(valueAt(data, key), valueAt(lastPersistedData, key)))) {
+          throw new Error("A conflict choice could not be saved locally. Your existing data was not removed; try again after checking browser storage.");
+        }
+        await writeSyncBase(userId, nextBase);
+        syncStatus("Conflict choices saved. Syncing the selected versions now.");
+        await syncNow();
+      }
+
+      async function syncCycle() {
+        if (storageMode !== "indexeddb" || !database) throw new Error("Account sync needs IndexedDB for safe local saves and conflict tracking. Your planner remains on this device.");
+        if (saveTimer) {
+          clearTimeout(saveTimer);
+          saveTimer = 0;
+          pendingKeys.clear();
+          await persist();
+        }
+        await writeQueue;
+        if (Object.keys(data).some(key => !core.sameValue(valueAt(data, key), valueAt(lastPersistedData, key)))
+          || Object.keys(lastPersistedData).some(key => !core.sameValue(valueAt(data, key), valueAt(lastPersistedData, key)))) {
+          throw new Error("Local changes are still being saved. Wait a moment, then sync again.");
+        }
+
+        const userId = authSession.user.id;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const baseRecords = await readSyncBase(userId);
+          const remoteRows = await fetchRemoteRecords();
+          const snapshot = { ...data };
+          const merge = core.mergePlannerData(baseRecords, snapshot, remoteRows);
+          if (merge.conflicts.length) {
+            pendingConflicts = {
+              baseRecords,
+              remoteRecords: merge.remoteRecords,
+              snapshot,
+              conflicts: merge.conflicts,
+              choices: Array(merge.conflicts.length).fill("")
+            };
+            renderSyncConflicts();
+            syncStatus(`${merge.conflicts.length} conflict${merge.conflicts.length === 1 ? "" : "s"} need your choice. No conflicting data was replaced.`);
+            return;
+          }
+
+          try {
+            await pushRemoteChanges(merge.remoteWrites, merge.remoteRecords);
+          } catch (error) {
+            if (error instanceof SyncRaceError && attempt < 2) continue;
+            if (error instanceof SyncRaceError) {
+              const latestRows = await fetchRemoteRecords();
+              const latestMerge = core.mergePlannerData(baseRecords, snapshot, latestRows);
+              if (latestMerge.conflicts.length) {
+                pendingConflicts = {
+                  baseRecords,
+                  remoteRecords: latestMerge.remoteRecords,
+                  snapshot,
+                  conflicts: latestMerge.conflicts,
+                  choices: Array(latestMerge.conflicts.length).fill("")
+                };
+                renderSyncConflicts();
+                syncStatus("Another device changed the same records. Choose which version to keep; neither was silently replaced.");
+                return;
+              }
+            }
+            throw error;
+          }
+
+          const finalRows = await fetchRemoteRecords();
+          const finalMerge = core.mergePlannerData(baseRecords, snapshot, finalRows);
+          if (finalMerge.conflicts.length) {
+            pendingConflicts = {
+              baseRecords,
+              remoteRecords: finalMerge.remoteRecords,
+              snapshot,
+              conflicts: finalMerge.conflicts,
+              choices: Array(finalMerge.conflicts.length).fill("")
+            };
+            renderSyncConflicts();
+            syncStatus("A record changed while syncing. Choose which version to keep; neither was silently replaced.");
+            return;
+          }
+
+          const nextData = { ...finalMerge.mergedData };
+          const keys = new Set([...Object.keys(snapshot), ...Object.keys(data), ...Object.keys(nextData)]);
+          for (const key of keys) {
+            if (!core.sameValue(valueAt(data, key), valueAt(snapshot, key))) {
+              const current = valueAt(data, key);
+              if (current.present) nextData[key] = current.value;
+              else delete nextData[key];
+            }
+          }
+          data = nextData;
+          applyingRemote = true;
+          await persist();
+          applyingRemote = false;
+          if (Object.keys(data).some(key => !core.sameValue(valueAt(data, key), valueAt(lastPersistedData, key)))
+            || Object.keys(lastPersistedData).some(key => !core.sameValue(valueAt(data, key), valueAt(lastPersistedData, key)))) {
+            throw new Error("Merged records could not be saved locally. The previous sync baseline is unchanged, so you can retry safely.");
+          }
+          await writeSyncBase(userId, finalMerge.remoteRecords);
+          syncStatus(`Synced ${Object.keys(finalMerge.remoteRecords).length} account record${Object.keys(finalMerge.remoteRecords).length === 1 ? "" : "s"} across your devices.`);
+          renderFocusHistory();
+          renderDiaryArchive();
+          renderOverview();
+          renderDay();
+          renderWeek();
+          renderMonth();
+          renderGoals();
+          renderProjectTables();
+          renderHabitGrid();
+          hydrate(document);
+          refreshProgress(document);
+          updateGreeting();
+          applyTheme();
+          return;
+        }
+        throw new Error("Sync could not settle after repeated changes. Your local records remain saved; try again when other devices are idle.");
+      }
+
+      async function syncNow() {
+        if (!core.canSyncAccount(syncConfigured, hasSyncConsent(), currentSyncOwner(), authSession?.user.id)) return;
+        try {
+          bindSyncOwner(authSession.user.id);
+        } catch (error) {
+          syncStatus(error.message, true);
+          renderSyncPanel();
+          return;
+        }
+        if (syncInProgress) {
+          syncAgain = true;
+          return;
+        }
+        syncInProgress = true;
+        syncAbortController = new AbortController();
+        byId("syncNow").disabled = true;
+        try {
+          do {
+            syncAgain = false;
+            await syncCycle();
+          } while (syncAgain && !pendingConflicts);
+        } catch (error) {
+          if (!hasSyncConsent()) syncStatus("Sync is off. No new account uploads will start; your local planner remains available.");
+          else syncStatus(`Sync needs attention: ${error.message} Your local planner remains available.`, true);
+        } finally {
+          syncInProgress = false;
+          syncAbortController = null;
+          byId("syncNow").disabled = false;
+        }
+      }
+
+      function scheduleRemoteSync(delay = 1200) {
+        if (!core.canSyncAccount(syncConfigured, hasSyncConsent(), currentSyncOwner(), authSession?.user.id)) return;
+        clearTimeout(syncTimer);
+        syncTimer = setTimeout(() => { void syncNow(); }, delay);
+      }
+
+      async function signIn(createAccount) {
+        if (!syncConfigured) return;
+        if (!saveSyncConsent()) {
+          syncStatus("Please confirm the data-sharing notice before signing in.", true);
+          return;
+        }
+        const email = byId("syncEmail").value.trim();
+        const password = byId("syncPassword").value;
+        if (!email || !password) {
+          syncStatus("Enter the email and password for your account.", true);
+          return;
+        }
+        try {
+          const path = createAccount ? "signup" : "token?grant_type=password";
+          const payload = createAccount
+            ? await authRequest(`${path}?redirect_to=${encodeURIComponent(location.href)}`, { email, password })
+            : await authRequest(path, { email, password });
+          if (!payload.access_token || !payload.user?.id) {
+            syncStatus("Check your email to confirm the account, then return here and sign in.");
+            return;
+          }
+          const ownerStatus = core.syncOwnerStatus(currentSyncOwner(), payload.user.id);
+          if (ownerStatus === "blocked") {
+            try {
+              await fetch(`${syncUrl}/auth/v1/logout?scope=local`, {
+                method: "POST",
+                headers: { apikey: syncKey, Authorization: `Bearer ${payload.access_token}` }
+              });
+            } catch { /* The unaccepted account is never stored or used for sync. */ }
+            syncStatus("This browser is linked to another account. The new sign-in was not saved, and local planner data was not uploaded. Use a separate browser profile or device for another account.", true);
+            return;
+          }
+          storeAuthSession({
+            ...payload,
+            expires_at: payload.expires_at || Math.floor(Date.now() / 1000) + Number(payload.expires_in || 3600)
+          });
+          syncStatus("Signed in. Comparing device and account data before syncing.");
+          await syncNow();
+        } catch (error) {
+          syncStatus(`Account sign-in failed: ${error.message}`, true);
+        }
+      }
+
+      byId("syncSignIn").addEventListener("click", () => { void signIn(false); });
+      byId("syncSignUp").addEventListener("click", () => { void signIn(true); });
+      byId("syncNow").addEventListener("click", () => { void syncNow(); });
+      byId("syncEnable").addEventListener("click", () => {
+        if (!saveSyncConsent()) {
+          syncStatus("Check the data-sharing notice to enable account sync.", true);
+          return;
+        }
+        renderSyncPanel();
+        syncStatus("Account sync enabled. Comparing device and account data.");
+        scheduleRemoteSync(0);
+      });
+      byId("syncDisable").addEventListener("click", () => {
+        try { localStorage.removeItem("daymark-sync-consent-v1"); } catch { /* No new sync requests will be scheduled. */ }
+        clearTimeout(syncTimer);
+        syncAgain = false;
+        pendingConflicts = null;
+        syncAbortController?.abort();
+        renderSyncConflicts();
+        renderSyncPanel();
+        syncStatus("Sync is off. Local records are unchanged; no new account uploads will start. An already-sent request may finish.");
+      });
+      byId("syncConsent").addEventListener("change", event => {
+        if (!event.target.checked) {
+          try { localStorage.removeItem("daymark-sync-consent-v1"); } catch { /* Local-only mode remains available. */ }
+          clearTimeout(syncTimer);
+          syncAbortController?.abort();
+          syncAgain = false;
+          renderSyncPanel();
+        }
+      });
+      byId("syncSignOut").addEventListener("click", async () => {
+        const oldSession = authSession;
+        clearTimeout(syncTimer);
+        syncAbortController?.abort();
+        syncAgain = false;
+        try { localStorage.removeItem("daymark-sync-consent-v1"); } catch { /* The local sign-out still stops scheduled sync. */ }
+        pendingConflicts = null;
+        renderSyncConflicts();
+        storeAuthSession(null);
+        if (!oldSession) return;
+        try {
+          await fetch(`${syncUrl}/auth/v1/logout?scope=local`, {
+            method: "POST",
+            headers: { apikey: syncKey, Authorization: `Bearer ${oldSession.access_token}` }
+          }).then(response => {
+            if (!response.ok) throw new Error(`Account sign-out could not be confirmed (${response.status}).`);
+          });
+          syncStatus("Signed out. Your planner remains saved on this device.");
+        } catch (error) {
+          syncStatus(`Signed out on this device, but server sign-out could not be confirmed: ${error.message}`, true);
+        }
+      });
+      byId("syncConflicts").addEventListener("click", event => {
+        const button = event.target.closest("[data-conflict-choice]");
+        if (!button || !pendingConflicts) return;
+        const index = Number(button.dataset.conflictIndex);
+        pendingConflicts.choices[index] = button.dataset.conflictChoice;
+        renderSyncConflicts();
+        if (pendingConflicts.choices.every(Boolean)) {
+          void applyResolvedConflicts().catch(error => syncStatus(`Could not apply conflict choices: ${error.message}`, true));
+        }
+      });
+
+      function applyTheme() {
+        document.documentElement.dataset.theme = theme;
+        const toggle = byId("themeToggle");
+        const dark = theme === "dark";
+        toggle.textContent = dark ? "Light mode" : "Dark mode";
+        toggle.setAttribute("aria-pressed", String(dark));
+        toggle.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+        toggle.title = dark ? "Switch to light mode" : "Switch to dark mode";
+      }
+
+      byId("themeToggle").addEventListener("click", () => {
+        theme = theme === "dark" ? "light" : "dark";
+        data._theme = theme;
+        persist();
+        applyTheme();
+      });
+
+      function mondayOf(date) {
+        const monday = new Date(date);
+        monday.setHours(12, 0, 0, 0);
+        monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
+        return monday;
+      }
+
+      function renderOverview() {
+        byId("todayMetric").textContent = selectedDate.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+        const start = mondayOf(selectedDate);
+        byId("overviewWeek").innerHTML = Array.from({ length: 7 }, (_, index) => {
+          const date = new Date(start);
+          date.setDate(start.getDate() + index);
+          return `<div class="day-tile"><strong>${date.toLocaleDateString(undefined, { weekday: "short" })}</strong><span>${date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span><br><button class="button" data-open-date="${localDate(date)}">Plan</button></div>`;
+        }).join("");
+      }
+
+      function renderDay() {
+        byId("dayDate").value = localDate(selectedDate);
+        const startValue = data["settings:start"] || "08:00";
+        const finishValue = data["settings:finish"] || "17:00";
+        const startHour = Number(startValue.split(":")[0]) || 8;
+        const finishHour = Number(finishValue.split(":")[0]) || 17;
+        const firstHour = Math.max(0, Math.min(22, startHour - 2));
+        const lastHour = Math.max(firstHour + 4, Math.min(23, finishHour + 3));
+        const slots = Array.from({ length: lastHour - firstHour + 1 }, (_, index) => {
+          const hour = firstHour + index;
+          const label = hour === 0 ? "12 AM" : hour < 12 ? `${hour} AM` : hour === 12 ? "12 PM" : `${hour - 12} PM`;
+          return `<div class="time-slot"><label>${label}</label><input data-key="time-${String(hour).padStart(2, "0")}" aria-label="${label} plan" placeholder="Leave open or add a plan"></div>`;
+        }).join("");
+        const title = dateLabel(selectedDate);
+        byId("dayContent").innerHTML = `
+          <div class="grid cols-3">
+            <div class="card"><h3>${escapeHtml(title)}</h3><div class="grid cols-2"><label class="field"><span>Sleep / rest</span><input data-key="sleep" placeholder="How rested do I feel?"></label><label class="field"><span>Energy · 1–5</span><input data-key="energy" inputmode="numeric" placeholder="Check in"></label></div><label class="field"><span>What would help today?</span><input data-key="need" placeholder="A realistic need, not another demand"></label></div>
+            <div class="card tinted"><h3>Three priorities</h3><label class="field"><span>Most important</span><input data-key="priority-1"></label><label class="field"><span>Also matters</span><input data-key="priority-2"></label><label class="field"><span>If there is room</span><input data-key="priority-3"></label></div>
+            <div class="card"><h3>Small daily anchors</h3><div class="checklist"><label class="check"><input type="checkbox" data-key="anchor-rest"><span>Leave space for rest.</span></label><label class="check"><input type="checkbox" data-key="anchor-food"><span>Make time to eat and drink.</span></label><label class="check"><input type="checkbox" data-key="anchor-buffer"><span>Keep a little buffer for the unexpected.</span></label></div><div class="progress"><span></span></div><div class="small progress-label">0 of 3 complete</div></div>
+          </div>
+          <div class="separator">Time map · your usual hours are just a starting point</div>
+          <div class="card"><div class="time-grid">${slots}</div></div>
+          <div class="grid cols-2" style="margin-top:13px">
+            <div class="card"><h3>Learning, work &amp; responsibilities</h3><label class="field"><span>Notes, questions or ideas</span><textarea data-key="notes"></textarea></label><label class="field"><span>One task to move forward</span><input data-key="task"></label><label class="check"><input type="checkbox" data-key="task-done"><span>Moved it forward today</span></label></div>
+            <div class="card"><h3>Focused time</h3><div class="checklist"><label class="check"><input type="checkbox" data-key="focus-1"><span>One useful focus block.</span></label><label class="check"><input type="checkbox" data-key="focus-2"><span>A second block, only if it fits.</span></label><label class="check"><input type="checkbox" data-key="reset"><span>Close out: note the next step.</span></label></div><div class="progress"><span></span></div><div class="small progress-label">0 of 3 complete</div></div>
+          </div>
+          <div class="grid cols-3" style="margin-top:13px">
+            <div class="card"><h3>Care &amp; movement</h3><label class="field"><span>Movement, fresh air or rest</span><input data-key="movement" placeholder="Choose what feels appropriate"></label><label class="field"><span>Meals / nourishment</span><textarea data-key="meals"></textarea></label></div>
+            <div class="card tinted"><h3>People &amp; personal time</h3><label class="field"><span>Connection or communication</span><input data-key="connection"></label><label class="field"><span>Time just for me</span><textarea data-key="personal-time"></textarea></label></div>
+            <div class="card"><h3>End-of-day note</h3><label class="field"><span>Something I did, learned or appreciated</span><textarea data-key="win"></textarea></label><label class="field"><span>Tomorrow's first useful step</span><input data-key="tomorrow"></label></div>
+          </div>
+          <div class="card" style="margin-top:13px"><h3>Life diary</h3><label class="field"><span>What would you like to remember about this day?</span><textarea data-key="diary-entry" placeholder="A moment, a thought, a lesson, or a few lines for future you." style="min-height:110px"></textarea></label><p class="small">Autosaved on this device. If account sync is enabled, diary entries sync to your configured account. Browse or search entries in Life diary.</p></div>
+          <div class="callout teal">A lighter day is still a valid day. Adjust expectations to your energy, health, responsibilities and circumstances.</div>`;
+        const page = byId("page-day");
+        page.dataset.scope = `day:${localDate(selectedDate)}`;
+        hydrate(page);
+        refreshProgress(page);
+      }
+
+      byId("dayDate").addEventListener("change", event => {
+        if (!event.target.value) return;
+        selectedDate = new Date(`${event.target.value}T12:00:00`);
+        shownMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+        renderDay();
+      });
+      byId("dayPrevious").addEventListener("click", () => { selectedDate.setDate(selectedDate.getDate() - 1); renderDay(); });
+      byId("dayNext").addEventListener("click", () => { selectedDate.setDate(selectedDate.getDate() + 1); renderDay(); });
+      byId("dayTemplate").addEventListener("click", () => {
+        const start = Number((data["settings:start"] || "08:00").split(":")[0]) || 8;
+        const finish = Number((data["settings:finish"] || "17:00").split(":")[0]) || 17;
+        const scope = `day:${localDate(selectedDate)}`;
+        const commitment = data["settings:commitment"]?.trim() || "Fixed commitment";
+        for (let hour = Math.max(0, start - 2); hour <= Math.min(23, finish + 3); hour++) {
+          const key = `${scope}:time-${String(hour).padStart(2, "0")}`;
+          if (data[key]) continue;
+          data[key] = hour === start - 1 ? "Morning routine / travel"
+            : hour >= start && hour <= finish ? commitment
+            : hour === finish + 1 ? "Transition / movement"
+            : hour === finish + 2 ? "Dinner / personal time"
+            : hour === finish + 3 ? "Wind down"
+            : "";
+        }
+        persist();
+        renderDay();
+        showToast("Usual hours added. Edit or clear any block.");
+      });
+      byId("dayClearTemplate").addEventListener("click", () => {
+        if (!window.confirm("Clear the time blocks for this day? Other notes and checkboxes will stay saved.")) return;
+        const prefix = `day:${localDate(selectedDate)}:time-`;
+        Object.keys(data).filter(key => key.startsWith(prefix)).forEach(key => delete data[key]);
+        persist();
+        renderDay();
+        showToast("Time blocks cleared.");
+      });
+
+      function diaryRecords() {
+        return Object.entries(data)
+          .map(([key, text]) => {
+            const match = key.match(/^day:(\d{4}-\d{2}-\d{2}):diary-entry$/);
+            return match && typeof text === "string" && text.trim()
+              ? { date: match[1], text: text.trim() }
+              : null;
+          })
+          .filter(Boolean)
+          .sort((a, b) => b.date.localeCompare(a.date));
+      }
+
+      function renderDiaryArchive() {
+        const archive = byId("diaryArchive");
+        if (!archive) return;
+        const query = byId("diarySearch").value.trim().toLocaleLowerCase();
+        const entries = diaryRecords().filter(entry =>
+          !query || entry.text.toLocaleLowerCase().includes(query) || entry.date.includes(query)
+        );
+        byId("diaryCount").textContent = entries.length
+          ? `${entries.length} ${entries.length === 1 ? "entry" : "entries"}${query ? " match your search." : " saved on this device."}`
+          : query ? "No entries match that search." : "No entries saved yet. Write one in a daily plan or above.";
+        archive.innerHTML = entries.slice(0, 100).map(entry => `
+          <article class="card">
+            <div class="row" style="justify-content:space-between"><h3>${escapeHtml(dateLabel(new Date(`${entry.date}T12:00:00`)))}</h3><button class="button" data-open-date="${entry.date}">Open day</button></div>
+            <div class="journal-entry">${escapeHtml(entry.text)}</div>
+          </article>`).join("");
+        if (entries.length > 100) byId("diaryCount").textContent = `Showing the newest 100 of ${entries.length} entries. Refine your search to find older entries.`;
+      }
+
+      byId("diaryDate").value = localDate(selectedDate);
+      byId("diaryDate").addEventListener("change", event => {
+        if (!event.target.value) return;
+        const key = `day:${event.target.value}:diary-entry`;
+        byId("diaryText").value = data[key] || "";
+      });
+      byId("diarySearch").addEventListener("input", renderDiaryArchive);
+      byId("saveDiary").addEventListener("click", async () => {
+        const date = byId("diaryDate").value;
+        if (!date) { showToast("Choose a date for this entry."); return; }
+        const key = `day:${date}:diary-entry`;
+        data[key] = byId("diaryText").value;
+        clearTimeout(saveTimer);
+        saveTimer = 0;
+        pendingKeys.clear();
+        await persist([key]);
+        renderDiaryArchive();
+        if (byId("storageStatus").classList.contains("error")) showToast("The entry needs a backup; local storage reported an error.");
+        else showToast("Diary entry saved on this device.");
+      });
+      byId("openDiaryDay").addEventListener("click", () => {
+        if (!byId("diaryDate").value) return;
+        selectedDate = new Date(`${byId("diaryDate").value}T12:00:00`);
+        setPage("day");
+      });
+
+      function renderWeek() {
+        const start = mondayOf(selectedDate);
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6);
+        byId("weekLabel").textContent = `${dateLabel(start, { month: "short", day: "numeric" })} – ${dateLabel(end, { month: "short", day: "numeric", year: "numeric" })}`;
+        byId("weekTiles").innerHTML = Array.from({ length: 7 }, (_, index) => {
+          const date = new Date(start);
+          date.setDate(start.getDate() + index);
+          return `<div class="day-tile"><strong>${date.toLocaleDateString(undefined, { weekday: "short" })}</strong><span>${date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span><br><button class="button" data-open-date="${localDate(date)}">Plan</button></div>`;
+        }).join("");
+        byId("focusRows").innerHTML = Array.from({ length: 5 }, (_, index) => {
+          const number = index + 1;
+          return `<tr><td>Focus ${number}</td><td><input data-key="focus-${number}-area" placeholder="Area"></td><td><input data-key="focus-${number}-finish" placeholder="A small finish line"></td><td><input data-key="focus-${number}-when" placeholder="Day / time"></td><td><input type="checkbox" data-key="focus-${number}-done" aria-label="Focus block ${number} complete"></td></tr>`;
+        }).join("");
+        byId("page-week").dataset.scope = `week:${localDate(start)}`;
+        hydrate(byId("page-week"));
+        refreshProgress(byId("page-week"));
+      }
+      byId("weekPrevious").addEventListener("click", () => { selectedDate.setDate(selectedDate.getDate() - 7); renderWeek(); });
+      byId("weekNext").addEventListener("click", () => { selectedDate.setDate(selectedDate.getDate() + 7); renderWeek(); });
+
+      function renderMonth() {
+        byId("monthLabel").textContent = shownMonth.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+        const first = new Date(shownMonth.getFullYear(), shownMonth.getMonth(), 1);
+        const offset = (first.getDay() + 6) % 7;
+        const monthLength = new Date(shownMonth.getFullYear(), shownMonth.getMonth() + 1, 0).getDate();
+        const previousLength = new Date(shownMonth.getFullYear(), shownMonth.getMonth(), 0).getDate();
+        const headings = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(day => `<div class="calendar-head">${day}</div>`).join("");
+        const cells = Array.from({ length: 42 }, (_, index) => {
+          let day, date, outside = false;
+          if (index < offset) { day = previousLength - offset + index + 1; date = new Date(shownMonth.getFullYear(), shownMonth.getMonth() - 1, day); outside = true; }
+          else if (index >= offset + monthLength) { day = index - offset - monthLength + 1; date = new Date(shownMonth.getFullYear(), shownMonth.getMonth() + 1, day); outside = true; }
+          else { day = index - offset + 1; date = new Date(shownMonth.getFullYear(), shownMonth.getMonth(), day); }
+          const key = `day:${localDate(date)}:priority-1`;
+          const note = data[key]?.trim();
+          return `<button class="calendar-day ${outside ? "outside" : ""} ${localDate(date) === localDate(selectedDate) ? "selected" : ""}" data-calendar-date="${localDate(date)}" aria-label="${escapeHtml(dateLabel(date))}${note ? `, priority: ${escapeHtml(note)}` : ""}"><strong>${day}</strong>${note ? `<small>${escapeHtml(note.slice(0, 20))}</small>` : ""}</button>`;
+        }).join("");
+        byId("calendar").innerHTML = headings + cells;
+        byId("page-month").dataset.scope = `month:${shownMonth.getFullYear()}-${String(shownMonth.getMonth() + 1).padStart(2, "0")}`;
+        hydrate(byId("page-month"));
+      }
+      byId("monthPrevious").addEventListener("click", () => { shownMonth.setMonth(shownMonth.getMonth() - 1); renderMonth(); });
+      byId("monthNext").addEventListener("click", () => { shownMonth.setMonth(shownMonth.getMonth() + 1); renderMonth(); });
+      byId("monthToday").addEventListener("click", () => {
+        selectedDate = new Date();
+        selectedDate.setHours(12, 0, 0, 0);
+        shownMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+        renderMonth();
+      });
+      byId("calendar").addEventListener("click", event => {
+        const day = event.target.closest("[data-calendar-date]");
+        if (!day) return;
+        selectedDate = new Date(`${day.dataset.calendarDate}T12:00:00`);
+        shownMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+        setPage("day");
+      });
+
+      function renderGoals() {
+        byId("horizonSelect").value = String(Math.max(1, Math.min(10, Number(data["goals:horizon"]) || 3)));
+        const horizon = Number(byId("horizonSelect").value);
+        byId("roadmapRows").innerHTML = Array.from({ length: horizon }, (_, index) => `<tr><td>Year ${index + 1}</td><td><input data-key="year-${index + 1}-theme" placeholder="A theme, not a rigid promise"></td><td><input data-key="year-${index + 1}-evidence" placeholder="What might show progress?"></td><td><input data-key="year-${index + 1}-review" type="month"></td></tr>`).join("");
+        byId("goalGrid").innerHTML = Array.from({ length: goalCount }, (_, index) => {
+          const number = index + 1;
+          return `<article class="card"><h3>Goal ${number}</h3><label class="field"><span>What matters?</span><input data-key="goal-${number}-name" placeholder="Describe an outcome that matters to you"></label><label class="field"><span>Why is this meaningful?</span><textarea data-key="goal-${number}-why"></textarea></label><label class="field"><span>Next small action</span><input data-key="goal-${number}-next"></label><label class="field"><span>Review date</span><input data-key="goal-${number}-review" type="date"></label></article>`;
+        }).join("");
+        hydrate(byId("page-goals"));
+        byId("horizonSelect").onchange = event => {
+          data["goals:horizon"] = event.target.value;
+          persist();
+          renderGoals();
+        };
+      }
+      byId("addGoalButton").addEventListener("click", () => {
+        if (goalCount >= 20) { showToast("The goal list is full. Review existing goals first."); return; }
+        goalCount++;
+        data._goalCount = goalCount;
+        persist();
+        renderGoals();
+      });
+
+      function renderProjectTables() {
+        byId("taskRows").innerHTML = Array.from({ length: taskCount }, (_, index) => {
+          const number = index + 1;
+          return `<tr><td><input data-key="task-${number}-name" placeholder="A clear next action"></td><td><input data-key="task-${number}-area" placeholder="Area"></td><td><input data-key="task-${number}-next"></td><td><input data-key="task-${number}-date" type="date"></td><td><input data-key="task-${number}-done" type="checkbox" aria-label="Task ${number} complete"></td></tr>`;
+        }).join("");
+        byId("journalRows").innerHTML = Array.from({ length: 5 }, (_, index) => {
+          const number = index + 1;
+          return `<tr><td><input data-key="journal-${number}-date" type="date"></td><td><input data-key="journal-${number}-tried"></td><td><input data-key="journal-${number}-result"></td><td><input data-key="journal-${number}-learned"></td><td><input data-key="journal-${number}-next"></td></tr>`;
+        }).join("");
+        hydrate(byId("page-projects"));
+      }
+      byId("addTask").addEventListener("click", () => {
+        if (taskCount >= 40) { showToast("The task list is full. Review existing tasks first."); return; }
+        taskCount++;
+        data._taskCount = taskCount;
+        persist();
+        renderProjectTables();
+      });
+      byId("removeTask").addEventListener("click", () => {
+        if (taskCount <= 6) { showToast("Keep at least six rows for planning."); return; }
+        if (!window.confirm("Remove the last task row? Its saved contents will also be removed.")) return;
+        const prefix = `projects:task-${taskCount}-`;
+        Object.keys(data).filter(key => key.startsWith(prefix)).forEach(key => delete data[key]);
+        taskCount--;
+        data._taskCount = taskCount;
+        persist();
+        renderProjectTables();
+      });
+
+      function renderHabitGrid() {
+        const page = byId("page-review");
+        const monthInput = byId("habitMonth");
+        if (!monthInput.value) monthInput.value = data["review:month"] || localDate(selectedDate).slice(0, 7);
+        const [year, month] = monthInput.value.split("-").map(Number);
+        const count = new Date(year, month, 0).getDate();
+        const headers = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(day => `<div class="calendar-head">${day}</div>`).join("");
+        const offset = (new Date(year, month - 1, 1).getDay() + 6) % 7;
+        const blank = Array.from({ length: offset }, () => "<span></span>").join("");
+        const cells = Array.from({ length: count }, (_, index) => {
+          const day = index + 1;
+          const key = `review:habit-${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+          const checked = data[key] === "true" ? "checked" : "";
+          return `<label class="card" style="padding:7px;text-align:center"><strong>${day}</strong><br><input type="checkbox" data-key="habit-${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}" aria-label="Mark day ${day} as a habit practice" ${checked}></label>`;
+        }).join("");
+        byId("habitGrid").innerHTML = headers + blank + cells;
+        hydrate(page);
+      }
+      byId("habitMonth").addEventListener("change", renderHabitGrid);
+
+      byId("backupButton").addEventListener("click", () => {
+        const backup = { app: "Daymark", version: 1, exportedAt: new Date().toISOString(), data };
+        const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "daymark-backup.json";
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast("Your backup has been downloaded.");
+      });
+      byId("restoreButton").addEventListener("click", () => byId("backupFile").click());
+      byId("backupFile").addEventListener("change", async event => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        try {
+          const parsed = JSON.parse(await file.text());
+          const restored = parsed?.data;
+          if (!restored || typeof restored !== "object" || Array.isArray(restored)) throw new Error("Invalid backup");
+          if (!window.confirm("Import this backup and replace the planner data in this browser?")) return;
+          data = restored;
+          theme = data._theme === "dark" || data._theme === "light"
+            ? data._theme
+            : (window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+          goalCount = Math.max(3, Math.min(20, Number(data._goalCount) || 3));
+          taskCount = Math.max(6, Math.min(40, Number(data._taskCount) || 6));
+          await persist();
+          renderOverview();
+          renderDay();
+          renderWeek();
+          renderMonth();
+          renderGoals();
+          renderProjectTables();
+          renderHabitGrid();
+          hydrate(document);
+          byId("diaryDate").value = localDate(selectedDate);
+          byId("diaryText").value = data[`day:${localDate(selectedDate)}:diary-entry`] || "";
+          renderDiaryArchive();
+          refreshProgress(document);
+          updateGreeting();
+          applyTheme();
+          showToast("Backup restored.");
+        } catch {
+          showToast("That file could not be read as a Daymark backup.");
+        } finally {
+          event.target.value = "";
+        }
+      });
+      byId("printButton").addEventListener("click", () => window.print());
+      window.addEventListener("pagehide", () => {
+        if (saveTimer) {
+          clearTimeout(saveTimer);
+          saveTimer = 0;
+          pendingKeys.clear();
+          persist();
+        }
+      });
+      let installPrompt = null;
+      window.addEventListener("beforeinstallprompt", event => {
+        event.preventDefault();
+        installPrompt = event;
+        byId("installButton").hidden = false;
+      });
+      byId("installButton").addEventListener("click", async () => {
+        if (!installPrompt) return;
+        installPrompt.prompt();
+        await installPrompt.userChoice;
+        installPrompt = null;
+        byId("installButton").hidden = true;
+      });
+      if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
+        navigator.serviceWorker.register("./sw.js").then(() => {
+          byId("installButton").title = "Install Daymark on this device";
+        }).catch(error => {
+          console.error("Daymark offline app setup failed:", error);
+          setStorageStatus("Offline mode unavailable", "warning", `The planner still saves locally, but the offline app could not be installed: ${error.message}`);
+        });
+      }
+      window.addEventListener("online", () => scheduleRemoteSync(0));
+      window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", event => {
+        if (data._theme) return;
+        theme = event.matches ? "dark" : "light";
+        applyTheme();
+      });
+
+      // Initial setup and saved-data hydration.
+      await initializeStorage();
+      authSession = loadAuthSession();
+      byId("page-goals").dataset.scope = "goals";
+      byId("page-projects").dataset.scope = "projects";
+      byId("page-review").dataset.scope = "review";
+      renderOverview();
+      renderDay();
+      renderWeek();
+      renderMonth();
+      renderGoals();
+      renderProjectTables();
+      renderHabitGrid();
+      pomodoroSession = readPomodoroSession();
+      renderPomodoro();
+      renderFocusHistory();
+      renderSyncPanel();
+      if (pomodoroSession) {
+        if (core.timerRemaining(pomodoroSession) <= 0) finishPomodoro(true);
+        else if (!pomodoroSession.paused) pomodoroTick = setInterval(updatePomodoro, 1000);
+      }
+      hydrate(document);
+      refreshProgress(document);
+      updateGreeting();
+      applyTheme();
+      byId("diaryDate").value = localDate(selectedDate);
+      renderDiaryArchive();
+      byId("loadingCover").hidden = true;
+      document.querySelector(".app").inert = false;
+      if (core.canSyncAccount(syncConfigured, hasSyncConsent(), currentSyncOwner(), authSession?.user.id)) scheduleRemoteSync(0);
+    })();
+  </script>
+</body>
+</html>
