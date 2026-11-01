@@ -23,11 +23,11 @@ Without backend configuration Daymark works in local-only mode: planner data sta
 
 ## Optional account sync setup
 
-Sync is disabled until the site owner configures a Supabase project. Do not put a service-role key in the app: the browser needs only the public project URL and publishable/anon key, and database row-level security must remain enabled.
+This copy is configured with the supplied Supabase project URL and publishable key in `config.js`. The publishable key is intended for browser use; never put a `service_role` or secret key in the app. Database row-level security must remain enabled.
 
-1. Create a Supabase project and apply `supabase/migrations/20261101000000_daymark_sync.sql` using the Supabase SQL editor or CLI.
+1. In the Supabase dashboard for this project, apply `supabase/migrations/20261101000000_daymark_sync.sql` using the SQL editor or Supabase CLI.
 2. Set the Supabase Authentication **Site URL** and allowed redirect URLs to the deployed Daymark origin. Add localhost URLs for local testing if needed; configure email confirmation as appropriate for the audience.
-3. Copy the project's URL and public publishable/anon key into `config.js` as `supabaseUrl` and `supabaseAnonKey`. This file is public static configuration, not a place for secrets.
+3. If you rotate the project's public credentials, update `config.js` with the project URL and the **publishable key** (or legacy `anon` key) from **Project Settings → API Keys**. This file is public static configuration, not a place for secrets; never use a `service_role` or secret key here.
 4. Publish/reload the app. In **Preferences → Optional account sync**, create an account or sign in, review and check the disclosure, then sync. Users must explicitly accept the disclosure before any planner data is sent.
 
 The database migration enables row-level security and allows an authenticated user to read or change only records whose `user_id` matches `auth.uid()`. It grants no access to anonymous users and does not grant record deletion; deletions are retained as per-account tombstones so they can sync safely. Run the ownership regression test with `supabase test db` in a configured Supabase CLI project. The app code never contains or asks for a service-role secret.
