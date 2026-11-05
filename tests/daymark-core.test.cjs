@@ -87,6 +87,7 @@ test("planner inline JavaScript parses and sync migration enforces ownership", (
   const storeSession = html.indexOf("storeAuthSession({", signInStart);
   assert.ok(ownerCheck > signInStart && ownerCheck < storeSession, "a different account is rejected before its session is stored");
   assert.match(html, /if \(core\.canSyncAccount\(syncConfigured, hasSyncConsent\(\), currentSyncOwner\(\), authSession\?\.user\.id\)\) scheduleRemoteSync\(0\)/);
+  assert.match(html, /account-sync table is not set up yet/);
   const focusRecordStart = html.indexOf("const record = {", html.indexOf("function finishPomodoro"));
   const focusRecordEnd = html.indexOf("\n            };", focusRecordStart);
   assert.ok(focusRecordStart > 0 && focusRecordEnd > focusRecordStart);
