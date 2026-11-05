@@ -351,7 +351,20 @@
           <label class="field"><span>What best describes this block?</span><select id="focusReflection"><option value="">Choose one or skip</option><option value="clear-step">The first step felt clear</option><option value="interrupted">I was interrupted</option><option value="plan-changed">I needed a different plan</option><option value="kept-going">I stayed with it</option><option value="needed-rest">I needed more rest</option></select></label>
           <div class="row"><button class="button primary" id="saveFocusReflection" type="button">Save check-in</button><button class="button" id="skipFocusReflection" type="button">Skip</button></div>
         </div>
-        <div class="callout teal">Daymark runs in your browser and cannot block other apps or websites. It does not request device-control permissions. If blocking helps, use built-in focus settings on your device separately.</div>
+        <div class="card tinted">
+          <h3>Want fewer app distractions?</h3>
+          <p>Daymark cannot block or lock other apps. A website or installed PWA is sandboxed by your device; claiming otherwise would be misleading. Use your device's built-in Focus or Digital Wellbeing controls instead. You stay in charge and can change those settings at any time.</p>
+          <details>
+            <summary>Find focus controls on your device</summary>
+            <div class="checklist" style="margin-top:10px">
+              <p class="small"><strong>iPhone or iPad:</strong> open Settings → Focus. For app limits, look in Screen Time. Menu names can vary by OS version.</p>
+              <p class="small"><strong>Android:</strong> look in Settings → Digital Wellbeing &amp; parental controls → Focus mode. Availability and controls vary by device maker.</p>
+              <p class="small"><strong>Windows:</strong> open Settings → System → Focus, or start a Focus session from Clock. These primarily quiet notifications; they do not hard-block every app.</p>
+              <p class="small"><strong>Mac:</strong> use Control Center → Focus to quiet notifications; Screen Time has optional app limits.</p>
+              <p class="small">Only configure controls for a device you own or are authorized to manage. If you are a teen, involve a trusted adult for restrictions that affect your device.</p>
+            </div>
+          </details>
+        </div>
         <div class="separator">Your focus history</div>
         <div class="card"><div class="small">Saved on this device; included in account sync when enabled. Task names are never included.</div><div class="focus-history" id="focusHistory" aria-live="polite"></div></div>
         <div class="callout">After a focus block, take a kind check-in: What helped? What got in the way? What is one small next step? Stopping early is useful information, not a failure.</div>
@@ -433,7 +446,7 @@
           </div>
           <div id="syncConflicts" aria-live="polite"></div>
         </div>
-        <div class="grid cols-2" style="margin-top:13px"><div class="card"><h3>Local data &amp; backups</h3><p class="small">Planner records are saved in this browser's IndexedDB database. Anyone with access to this browser profile may be able to access them; browser storage is not encrypted by Daymark.</p><p class="small">The browser may grant persistent storage, but cannot guarantee years of data if site data is cleared, a device is lost, or storage is removed. Export regular backups and keep copies somewhere private.</p></div><div class="card"><h3>Open, free and easy to share</h3><p class="small">Daymark stays a static website with no ads, trackers, or device-control permissions. You can host it with GitHub Pages or install it as an app when served over HTTPS.</p><p class="small">Printing uses your browser's print dialog. Choose A4 paper and “Save as PDF” for a digital copy.</p></div></div>
+        <div class="grid cols-2" style="margin-top:13px"><div class="card"><h3>Install Daymark on another device</h3><p>Open the secure Daymark website from the device you want to use, then use your browser's install or add-to-home-screen option. The site needs HTTPS for installation and service-worker features. A local network address such as <code>http://192.168…</code> is only a temporary preview, not the public secure site.</p><p><a href="https://varadbrahma.github.io/daymark/" rel="noopener">Open Daymark over HTTPS</a> · if the page is not available yet, the site owner still needs to finish publishing it.</p><details><summary>Installation steps by device</summary><div class="checklist" style="margin-top:10px"><p class="small"><strong>Android:</strong> open the HTTPS link in Chrome, then choose Install app or Add to Home screen from the browser menu.</p><p class="small"><strong>iPhone or iPad:</strong> open the HTTPS link in Safari, tap Share, then Add to Home Screen.</p><p class="small"><strong>Desktop:</strong> open the HTTPS link in a supported Chrome or Edge browser and choose Install from the address bar or browser menu, when offered.</p></div></details><p class="small">An installed PWA is still a website, not a native app-store download. Your device may keep its own local planner data; sign into the same Daymark account and opt in to sync to use your records across devices.</p></div><div class="card"><h3>Local data &amp; backups</h3><p class="small">Planner records are saved in this browser's IndexedDB database. Anyone with access to this browser profile may be able to access them; browser storage is not encrypted by Daymark.</p><p class="small">The browser may grant persistent storage, but cannot guarantee years of data if site data is cleared, a device is lost, or storage is removed. Export regular backups and keep copies somewhere private.</p></div></div>
         <div class="callout teal">Need a fresh start? Export a backup first, then clear this site's saved data in your browser settings. This app does not silently erase your work.</div>
       </section>
 

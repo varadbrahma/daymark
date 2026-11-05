@@ -7,8 +7,8 @@ Daymark combines a flexible daily planner and diary with goals, projects, wellbe
 ## Try it
 
 - **Run it locally:** serve this folder from a local web server and open its URL. For example, `python -m http.server 8765` from this folder, then visit `http://127.0.0.1:8765/`.
-- **Publish it:** GitHub Pages can serve the static files directly; no build step or package manager is required.
-- **Install it:** serve the app over HTTPS or localhost, open it in a supported browser, and choose **Install app** when offered. For local PWA testing, use localhost rather than `file://`.
+- **Use it on another device:** open [https://varadbrahma.github.io/daymark/](https://varadbrahma.github.io/daymark/) from that device. If the site has not been published yet, open the repository's **Actions** tab and wait for **Publish Daymark** to complete.
+- **Install it:** use the browser's **Install app** or **Add to Home Screen** option on the HTTPS site. `localhost` is supported for development; a local Wi-Fi IP or `file://` is not a secure install origin.
 
 Without backend configuration Daymark works in local-only mode: planner data stays in this browser's IndexedDB, backups can be exported or restored, and the focus timer works without an account. There are no ads, trackers, or device-control permissions.
 
@@ -20,6 +20,7 @@ Without backend configuration Daymark works in local-only mode: planner data sta
 - Automatic IndexedDB saving, backward-compatible migration from the earlier local-storage version, and JSON backup export/restore.
 - Optional account sync to a user-configured Supabase project. Sync uses account-owned records and row-level access policies; simultaneous edits are surfaced for an explicit choice.
 - Light and dark themes, installable PWA shell, offline app files, and print-friendly A4 layouts.
+- Device guidance for built-in distraction controls; the website itself cannot block or lock other apps.
 
 ## Optional account sync setup
 
@@ -36,17 +37,15 @@ The first successful sync binds that browser's local planner to one account. **T
 
 Account sync uploads all saved planner values, including diary text and personal notes, over HTTPS to the configured Supabase project and stores them under the signed-in account. Sync is not end-to-end encrypted. Do not enable it unless you trust the project owner and their hosting/security practices. Conflicting edits to the same planner item are not silently replaced: Daymark asks whether to keep the current device or account version. Other-device records and unrelated local edits are merged. Export backups regularly even when sync is enabled.
 
-The Pomodoro timer runs in the browser and cannot block other apps or websites. It does not request operating-system/device-control permissions. Use your device's built-in focus tools separately if you want app blocking.
+The Pomodoro timer runs in the browser and cannot block or lock other apps or websites. A PWA is sandboxed by the operating system and does not request device-control permissions. For distraction limits, use your device's own Focus, Digital Wellbeing, Screen Time, or app-limit settings; those are configured and controlled by the device owner.
 
-## Publish with GitHub Pages
+## HTTPS publishing and installation
 
-1. Add the project files to a repository.
-2. Open **Settings → Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**.
-4. Choose the `main` branch and `/ (root)` folder, then save.
-5. Open the Pages URL GitHub provides.
+The GitHub Actions workflow in `.github/workflows/pages.yml` publishes this static site on pushes to `main`. Enable GitHub Pages in **Settings → Pages** and set **Build and deployment → Source** to **GitHub Actions**. When the workflow completes, open [https://varadbrahma.github.io/daymark/](https://varadbrahma.github.io/daymark/) over HTTPS. GitHub Pages provisions HTTPS for the public site; do not enter account credentials on an untrusted HTTP preview.
 
-If enabling sync, complete the setup above before deployment and configure the Supabase redirect URLs for the exact published origin.
+On Android, open the HTTPS URL in Chrome and choose **Install app** or **Add to Home screen**. On iPhone/iPad, open it in Safari, tap **Share → Add to Home Screen**. On supported desktop browsers, use the install icon or browser menu. This makes an installable website shortcut, not a native app-store package.
+
+Before account sign-up/sync works on the deployed site, the Supabase owner must apply the database migration above and add `https://varadbrahma.github.io/daymark/` to the Supabase Authentication Site URL/allowed redirects. Keep the public publishable key in `config.js`; never use a service-role key.
 
 ## Privacy and backups
 
